@@ -35,7 +35,7 @@ static PyObject *Py_find_Xrays(PyObject *self, PyObject *args, PyObject *keywds)
   int rows, columns, length;
   int modp = 0;
   int filtering = 1;
-  static char *kwlist[] = {"rows", "columns", "matrix", "modp", "filtering"};
+  static char *kwlist[] = {"rows", "columns", "matrix", "modp", "filtering", NULL};
 
   if ( !PyArg_ParseTupleAndKeywords(args, keywds, "iiO|ii:find_vertices", kwlist,
 			 &rows, &columns, &pymatrix, &modp, &filtering) )
