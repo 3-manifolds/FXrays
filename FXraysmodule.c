@@ -24,6 +24,7 @@ static void *build_vertex_list(vertex_stack_t *stack, int dimension){
       for (i=0; i<dimension ; i++)
 	PyTuple_SetItem(coeff, i, PyInt_FromLong((long)V->vector[i]));
       PyList_Append(result, coeff);
+      Py_DECREF(coeff);
     }
   }
   return result;
