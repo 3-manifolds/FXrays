@@ -1,7 +1,8 @@
 CFLAGS = -O3 -funroll-loops
 
-CC = gcc-3.2
-#CC = gcc
+#This code is a lot faster with gcc-3.2; use it if you have it.
+#CC = gcc-3.2
+CC = gcc
 
 tests: tests/test0 tests/test1 tests/test2 tests/magic5
 
