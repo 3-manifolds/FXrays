@@ -1,3 +1,12 @@
+/******************************************************************
+$Id$
+   FXrays -- computes extremal rays with filtering.
+   Copyright (C) 2002 Marc Culler, Nathan Dunfield and others
+
+   This program is distributed under the terms of the 
+   GNU General Public License, version 2 or later, as published by
+   the Free Software Foundation.  See the file GPL.txt for details.
+*******************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
