@@ -80,7 +80,7 @@ containing the module.  In order for python to find the module you
 must add this directory to your PYTHONPATH environment variable.  For
 example:
 
-export PYTHONPATH=$PYTHONPATH:~/FXrays
+export PYTHONPATH=$HOME
 
 Bugs and Comments
 -------------------------
