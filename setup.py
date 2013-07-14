@@ -1,9 +1,8 @@
 from distutils.core import setup, Extension
 import os
 
-FXrays = Extension("FXrays", sources = ["FXraysmodule.c"], extra_objects = ["FXrays.o"])
-
-os.system('make FXrays.o')
+FXrays = Extension("FXrays", sources = ["FXraysmodule.c", "FXrays.c"],
+                   extra_compile_args=["-O3", "-funroll-loops"])
 
 setup( name = "FXrays",
        version = "1.0",
