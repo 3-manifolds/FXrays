@@ -10,6 +10,7 @@ $Id$
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 #include "FXrays.h"
 
 static void no_memory(void);
@@ -117,7 +118,7 @@ void recycle_vertices(vertex_stack_t *stack, reservoir_t *reservoir){
 void set_support(unsigned int index, support_t *support){
   int i;
 
-  if (index & 0x01 != 0)
+  if (index & (0x01 != 0))
     i = 2 + (index >> 6);
   else 
     i = (index >> 6);
@@ -126,7 +127,6 @@ void set_support(unsigned int index, support_t *support){
 
 vertex_t *unit_vertex(unsigned int index, reservoir_t *reservoir){
   vertex_t *result;
-  int i;
 
   result = new_vertex(reservoir);
   result->vector[index] = 1;
@@ -192,11 +192,12 @@ matrix_t *new_matrix(int rows, int columns){
   return result;
 };
 
-void *destroy_matrix(matrix_t *matrix){
+void destroy_matrix(matrix_t *matrix){
   if (matrix != NULL)
     free(matrix);
 };
 
+/* 
 static void print_matrix(matrix_t *matrix){
   int i,j, *p = matrix->matrix;
 
@@ -207,6 +208,7 @@ static void print_matrix(matrix_t *matrix){
   }
   printf("\n");
 }
+*/
 
 int test_corank(matrix_t *M, int threshold){
   int i, j, k, a, b, d;
@@ -361,7 +363,7 @@ filter_list_t *embedded_filter(int tets){
   return result;
 }
 
-void *destroy_filter_list(filter_list_t *filterlist){
+void destroy_filter_list(filter_list_t *filterlist){
   if (filterlist != NULL)
     free(filterlist);
 };
@@ -376,7 +378,7 @@ void *destroy_filter_list(filter_list_t *filterlist){
 int filter(vertex_t *v, filter_list_t *filter_list){
   int size;
   support_t *filter;
-  register int CS0, CS1, CS2, CS3, result;
+  register int CS0, CS1, CS2, CS3, result=0;
 
   if (filter_list == NULL)
     return 1;
@@ -403,10 +405,9 @@ int filter(vertex_t *v, filter_list_t *filter_list){
 void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress,
 		    void *(*output_func)(vertex_stack_t *stack, int dimension)){
   void *result;
-  int i, x, dimension = matrix->columns, size = dimension*matrix->rows;
+  int i, dimension = matrix->columns;
   int slice, filtered = 0, interior = 0;
   int numpos, numneg, numzero;
-  int *p;
   vertex_stack_t positives = NULL, negatives = NULL, zeros = NULL, current = NULL;
   reservoir_t *reservoir = new_reservoir(dimension);
   vertex_t *vertex = NULL, *P, *N;
@@ -423,7 +424,7 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_prog
     numpos = 0;
     numneg = 0;
     numzero = 0;
-    while ( vertex = pop_vertex(&current) ){
+    while ( (vertex = pop_vertex(&current)) ){
       evaluate(matrix, slice, vertex);
       if (vertex->value > 0) {
 	push_vertex(vertex, &positives);
@@ -489,7 +490,6 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int prin
   int i, x, dimension = matrix->columns, size = dimension*matrix->rows;
   int slice, filtered = 0, interior = 0;
   int numpos, numneg, numzero;
-  int *p;
   vertex_stack_t positives = NULL, negatives = NULL, zeros = NULL, current = NULL;
   reservoir_t *reservoir = new_reservoir(dimension);
   vertex_t *vertex = NULL, *P, *N;
@@ -514,7 +514,7 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int prin
     numpos = 0;
     numneg = 0;
     numzero = 0;
-    while ( vertex = pop_vertex(&current) ){
+    while ( (vertex = pop_vertex(&current)) ){
       evaluate(matrix, slice, vertex);
       if (vertex->value > 0) {
 	push_vertex(vertex, &positives);
