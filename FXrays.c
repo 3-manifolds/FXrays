@@ -249,7 +249,7 @@ int test_corank(matrix_t *M, int threshold){
 	  d = gcd(a,b);
 	  b = -b/d;
 	  if ( ax_plus_by(numcols-j, b, a/d, A[i]+j, A[k]+j) != 0)
-	    printf("Overflow in ax_plus_by!\n");
+	      fprintf(stderr, "Overflow in ax_plus_by!\n");
 	}
       }
 
@@ -337,7 +337,7 @@ filter_list_t *embedded_filter(int tets){
   int i,size = 3*tets;
 
   if (tets > 42){
-    printf("Too many tetrahedra!\n");
+      fprintf(stderr, "Too many tetrahedra!\n");
     exit(-1);
   }
 
@@ -400,8 +400,8 @@ int filter(vertex_t *v, filter_list_t *filter_list){
   return result;
 }
 
-void *find_vertices(matrix_t *matrix, filter_list_t *filter_list,
-                   void *(*output_func)(vertex_stack_t *stack, int dimension) ){
+void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress,
+		    void *(*output_func)(vertex_stack_t *stack, int dimension)){
   void *result;
   int i, x, dimension = matrix->columns, size = dimension*matrix->rows;
   int slice, filtered = 0, interior = 0;
@@ -417,7 +417,9 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list,
   }
 
   for (slice = 0; slice < matrix->rows; slice++) {
-    printf("slice %3d : ", slice);
+      if (print_progress){
+	  printf("slice %3d : ", slice);
+      }
     numpos = 0;
     numneg = 0;
     numzero = 0;
@@ -436,8 +438,9 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list,
 	++numzero;
       }
     }
-
-    printf(" %5d positive %5d negative %5d zero\n",numpos, numneg, numzero);
+    if (print_progress){
+	printf(" %5d positive %5d negative %5d zero\n",numpos, numneg, numzero);
+    }
 
     for (P = positives; P != NULL; P = P->next) {
       for (N = negatives; N != NULL; N = N->next) {
@@ -468,8 +471,10 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list,
     recycle_vertices(&negatives, reservoir);
   }  
 
-  printf("DONE.  %d vertices were filtered;   %d were interior. \n",
+  if (print_progress){
+      printf("DONE.  %d vertices were filtered;   %d were interior. \n",
 	 filtered, interior);
+  }
   result = output_func(&current, dimension);
   recycle_vertices(&current, reservoir);
   destroy_reservoir(reservoir);
@@ -478,8 +483,8 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list,
   return result;
 }
 
-void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list,
-                   void *(*output_func)(vertex_stack_t *stack, int dimension) ){
+void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
+			  void *(*output_func)(vertex_stack_t *stack, int dimension) ){
   void *result;
   int i, x, dimension = matrix->columns, size = dimension*matrix->rows;
   int slice, filtered = 0, interior = 0;
@@ -503,7 +508,9 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list,
   }
 
   for (slice = 0; slice < matrix->rows; slice++) {
-    printf("slice %3d : ", slice);
+    if (print_progress){
+	printf("slice %3d : ", slice);
+    }
     numpos = 0;
     numneg = 0;
     numzero = 0;
@@ -523,7 +530,9 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list,
       }
     }
 
-    printf(" %5d positive %5d negative %5d zero\n",numpos, numneg, numzero);
+    if (print_progress){
+	printf(" %5d positive %5d negative %5d zero\n",numpos, numneg, numzero);
+    }
 
     for (P = positives; P != NULL; P = P->next) {
       for (N = negatives; N != NULL; N = N->next) {
@@ -554,8 +563,10 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list,
     recycle_vertices(&negatives, reservoir);
   }  
 
-  printf("DONE.  %d vertices were filtered;   %d were interior. \n",
+  if (print_progress){
+      printf("DONE.  %d vertices were filtered;   %d were interior. \n",
 	 filtered, interior);
+  }
   result = output_func(&current, dimension);
   recycle_vertices(&current, reservoir);
   destroy_reservoir(reservoir);
