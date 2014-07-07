@@ -76,11 +76,11 @@ void         set_support(unsigned int index, support_t *support);
 
 //matrices
 matrix_t    *new_matrix(int rows, int columns);
-void        *destroy_matrix(matrix_t *matrix);
+void        destroy_matrix(matrix_t *matrix);
 
 //filterlists
 filter_list_t *embedded_filter(int tets);
-void          *destroy_filter_list(filter_list_t *filterlist);
+void          destroy_filter_list(filter_list_t *filterlist);
 
 //components of the algorithm
 void   evaluate(matrix_t *A, int row, vertex_t *v); 
