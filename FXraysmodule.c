@@ -36,10 +36,12 @@ static PyObject *Py_find_Xrays(PyObject *self, PyObject *args, PyObject *keywds)
   int rows, columns, length;
   int modp = 0;
   int filtering = 1;
-  static char *kwlist[] = {"rows", "columns", "matrix", "modp", "filtering", NULL};
+  int print_progress = 1;
 
-  if ( !PyArg_ParseTupleAndKeywords(args, keywds, "iiO|ii:find_vertices", kwlist,
-			 &rows, &columns, &pymatrix, &modp, &filtering) )
+  static char *kwlist[] = {"rows", "columns", "matrix", "modp", "filtering", "print_progress", NULL};
+
+  if ( !PyArg_ParseTupleAndKeywords(args, keywds, "iiO|iii:find_vertices", kwlist,
+		   &rows, &columns, &pymatrix, &modp, &filtering, &print_progress) )
     return NULL;
 
   if ( !PySequence_Check(pymatrix) ){
@@ -70,9 +72,9 @@ static PyObject *Py_find_Xrays(PyObject *self, PyObject *args, PyObject *keywds)
       }
 
     if (modp)
-      result = (PyObject*)find_vertices_mod_p(matrix, filter, build_vertex_list);
+	result = (PyObject*)find_vertices_mod_p(matrix, filter, print_progress, build_vertex_list);
     else
-      result = (PyObject*)find_vertices(matrix, filter, build_vertex_list);
+	result = (PyObject*)find_vertices(matrix, filter, print_progress, build_vertex_list);
     if (filter)
       destroy_filter_list(filter);
     destroy_matrix(matrix);

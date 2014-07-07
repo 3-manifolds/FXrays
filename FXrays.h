@@ -88,10 +88,10 @@ int    test_corank(matrix_t *A, int threshold);
 int    test_corank_mod_p(matrix_t *A, int threshold);
 
 //main functions
-void *find_vertices(matrix_t *matrix, filter_list_t *filter_list,
-		    void *(*output_func)(vertex_stack_t *stack, int dimension) );
-void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list,
-			  void *(*output_func)(vertex_stack_t *stack, int dimension) );
+void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
+		    void *(*output_func)(vertex_stack_t *stack, int dimension));
+void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
+			  void *(*output_func)(vertex_stack_t *stack, int dimension));
 
 //testing
 void *print_vertices(vertex_stack_t *stack, int dimension);
