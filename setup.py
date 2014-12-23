@@ -1,5 +1,5 @@
-import os
-from setuptools import setup, Extension
+import os, re
+from setuptools import setup, Command, Extension
 
 long_description =  """\
 This package is a small, fast implementation of an algorithm for
@@ -23,13 +23,32 @@ The algorithm is due to Dave Letscher, and incorporates ideas of Komei
 Fukuda's.
 """
 
-FXrays = Extension('FXrays',
-                   sources = ['FXraysmodule.c', 'FXrays.c'],
-                   extra_compile_args=['-O3', '-funroll-loops'])
+FXrays = Extension(
+    name = 'FXrays.FXrays',
+    sources = ['c_src/FXraysmodule.c', 'c_src/FXrays.c'],
+    include_dirs = ['c_src'], 
+    extra_compile_args=['-O3', '-funroll-loops'])
+
+class clean(Command):
+    """
+    Clean *all* the things!
+    """
+    user_options = []
+    def initialize_options(self):
+        pass 
+    def finalize_options(self):
+        pass
+    def run(self):
+        os.system('rm -rf build dist *.pyc FXrays.egg-info')
+
+
+# Get version number from module
+version = re.search("__version__ = '(.*)'",
+                    open('python_src/__init__.py').read()).group(1)
 
 setup(
     name = 'FXrays',
-    version = '1.2',
+    version = version,
     description = 'Computes extremal rays with filtering',
     long_description = long_description,
     url = 'http://t3m.computop.org',
@@ -41,12 +60,16 @@ setup(
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
         'Programming Language :: C',
+        'Programming Language :: Python',
         'Topic :: Scientific/Engineering :: Mathematics',
         ],
+
+    packages = ['FXrays'],
+    package_dir = {'FXrays':'python_src'}, 
     ext_modules = [FXrays],
-    packages = ['test'], 
+    cmdclass = {'clean':clean},
+    zip_safe=False, 
 )
 
 
