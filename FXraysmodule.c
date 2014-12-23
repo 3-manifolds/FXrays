@@ -84,7 +84,27 @@ static PyObject *Py_find_Xrays(PyObject *self, PyObject *args, PyObject *keywds)
 
 /* Documentation */
 static char find_Xrays_doc[]=
-"Someone should document this.\n"
+"Find the extremal rays of the cone defined by the intersection of the\n"
+"solution set of the given linear equations and the positive orthant.\n"
+"Arguments are (in order):\n"
+"\n"
+"rows: Number of rows of the matrix of linear equations.\n"
+"\n"
+"columns: Number of columns of the matrix of linear equations.\n"
+"\n"
+"matrix: The matrix of linear equations, given as a flat list of length\n"
+"   rows*columns.\n"
+"\n"
+"modp (optional, default False): Whether to do the computation\n"
+"   over p = 2^31 - 1 rather than Z.\n"
+"\n"
+"filter (optional, default True): Return only those extremal rays\n"
+"   corresponding to embedded surfaces in quad coordinates.  That is, if V\n"
+"   is the vector corresponding to the ray, then for each triple\n"
+"    V[3*i:3*(i+1)] at most one entry is non-zero.\n"
+"\n"
+"print_progress (optional, default True): Whether to print out\n"
+"   statistics on the progress of the computation.\n"
 "\n";
 
 /* List of functions defined in the module */
