@@ -20,10 +20,10 @@ int testmatrix[] = {
   1, 1, 1, 1, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0
 };
 
-main(){
+int main(){
   filter_list_t *testfilter;
   int i;
 
   testfilter = NULL;
-  find_vertices((matrix_t *)&testmatrix, testfilter, print_vertices);
+  find_vertices((matrix_t *)&testmatrix, testfilter, 1, print_vertices);
 }
