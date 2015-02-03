@@ -1,6 +1,3 @@
-import os, re
-from setuptools import setup, Command, Extension
-
 long_description =  """\
 This package is a small, fast implementation of an algorithm for
 finding extremal rays of a polyhedral cone, with filtering.  It is
@@ -23,10 +20,13 @@ The algorithm is due to Dave Letscher, and incorporates ideas of Komei
 Fukuda's.
 """
 
+import os, re, sys
+from setuptools import setup, Command, Extension
+
 FXrays = Extension(
     name = 'FXrays.FXrays',
-    sources = ['c_src/FXraysmodule.c', 'c_src/FXrays.c'],
-    include_dirs = ['c_src'], 
+    sources = ['cython_src/FXraysmodule.c', 'c_src/FXrays.c'],
+    include_dirs = ['cython_src', 'c_src'], 
     extra_compile_args=['-O3', '-funroll-loops'])
 
 class clean(Command):
@@ -40,6 +40,15 @@ class clean(Command):
         pass
     def run(self):
         os.system('rm -rf build dist *.pyc FXrays.egg-info')
+
+# If have Cython, check that .c files are up to date:
+
+try:
+    from Cython.Build import cythonize
+    if 'clean' not in sys.argv:
+        cythonize(['cython_src/FXraysmodule.pyx'])
+except ImportError:
+    pass 
 
 
 # Get version number from module
@@ -61,6 +70,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
         'Operating System :: OS Independent',
         'Programming Language :: C',
+        'Programming Language :: Cython',
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering :: Mathematics',
         ],
