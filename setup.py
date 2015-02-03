@@ -24,7 +24,7 @@ import os, re, sys
 from setuptools import setup, Command, Extension
 
 FXrays = Extension(
-    name = 'FXrays.FXrays',
+    name = 'FXrays.FXraysmodule',
     sources = ['cython_src/FXraysmodule.c', 'c_src/FXrays.c'],
     include_dirs = ['cython_src', 'c_src'], 
     extra_compile_args=['-O3', '-funroll-loops'])

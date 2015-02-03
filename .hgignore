@@ -1,0 +1,4 @@
+FXrays.egg-info/
+build/
+dist/
+cython_src/FXraysmodule.c

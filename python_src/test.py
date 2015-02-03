@@ -147,7 +147,8 @@ def magic5():
         0, 1, 1, 1, 1, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 
         1, 1, 1, 1, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0]
 
-    return len(FXrays.find_Xrays(rows, columns, matrix, filtering=0, print_progress=False))
+    return len(FXrays.find_Xrays(rows, columns, matrix, filtering=False,
+                                 modp=True, print_progress=False))
 
 if __name__ == '__main__':
     import doctest

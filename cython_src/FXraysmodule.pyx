@@ -27,7 +27,6 @@ cdef extern from "FXrays.h":
     void destroy_matrix(matrix_t *matrix)
     filter_list_t *embedded_filter(int tets)
     void destroy_filter_list(filter_list_t *filterlist)
-
     
     void* find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
                     void *(*output_func)(vertex_stack_t *stack, int dimension))
@@ -35,10 +34,13 @@ cdef extern from "FXrays.h":
     void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
                           void *(*output_func)(vertex_stack_t *stack, int dimension))
 
+
+cdef extern from "Python.h":
+    cdef void Py_INCREF(object o)
+
 cdef void* build_vertex_list(vertex_stack_t *stack, int dimension):
     cdef long coeff
-    cdef vertex_t *V = *stack
-     
+    cdef vertex_t *V = stack[0]
     result = []
     while V != NULL:
         vector = []
@@ -47,6 +49,7 @@ cdef void* build_vertex_list(vertex_stack_t *stack, int dimension):
             vector.append(coeff)
         result.append(tuple(vector))
         V = V.next
+    Py_INCREF(result)
     return <void*> result
 
 
@@ -60,7 +63,7 @@ def find_Xrays(int rows, int columns, matrix, modp=False,
 
     if filtering:
         filter = embedded_filter(columns/3)
-        
+
     for i, c in enumerate(matrix):
         c_matrix.matrix[i] = c
 
@@ -74,7 +77,7 @@ def find_Xrays(int rows, int columns, matrix, modp=False,
     if filtering:
         destroy_filter_list(filter)
     destroy_matrix(c_matrix)
-    
+    return result
         
     
     
