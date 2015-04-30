@@ -46,7 +46,9 @@ class clean(Command):
 try:
     from Cython.Build import cythonize
     if 'clean' not in sys.argv:
-        cythonize(['cython_src/FXraysmodule.pyx'])
+        file = 'cython_src/FXraysmodule.pyx'
+        if os.path.exists(file):
+            cythonize([file])
 except ImportError:
     pass 
 
