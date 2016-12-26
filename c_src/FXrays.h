@@ -31,14 +31,14 @@ typedef struct vertex_s {
   support_t support;
   struct vertex_s *next;
   int value;
-  int vector[0];
+  int vector[];
 } vertex_t;
 
 typedef vertex_t* vertex_stack_t;
 
 typedef struct block_s {
   struct block_s *next;
-  vertex_t vertices[0];
+  vertex_t vertices[];
 } block_t;
 
 typedef struct reservoir_s {
@@ -49,13 +49,13 @@ typedef struct reservoir_s {
 
 typedef struct filter_list_s {
   int size;
-  support_t filter[0];
+  support_t filter[];
 } filter_list_t;
 
 typedef struct matrix_s {
   int rows;
   int columns;
-  int matrix[0];   // allow room for rows*columns+1 int32's !!!!
+  int matrix[];   // allow room for rows*columns+1 int32's !!!!
 } matrix_t;
 
 //reservoirs

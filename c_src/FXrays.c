@@ -214,7 +214,8 @@ int test_corank(matrix_t *M, int threshold){
   int i, j, k, a, b, d;
   int corank = 0;
   int numcols = M->columns, numrows = M->rows;
-  int *p, *A[numrows];
+  int *p, **A;
+  A = malloc(numrows*sizeof(int *));
 
   // build a permuted row index
   p = M->matrix;
@@ -261,6 +262,7 @@ int test_corank(matrix_t *M, int threshold){
       // but if we reached the last row then all rows are independent
       if (i == numrows) {
 	corank = numcols - numrows;
+	free(A);
 	if (corank > threshold)
 	  return -1;
 	else
@@ -269,6 +271,7 @@ int test_corank(matrix_t *M, int threshold){
 
     } // end else
   } // end for j
+  free(A);
   return corank;
 }
 
@@ -278,7 +281,8 @@ int test_corank_mod_p(matrix_t *M, int threshold){
   int i, j, k, a, b;
   int corank = 0;
   int numcols = M->columns, numrows = M->rows;
-  int *p, *A[numrows];
+  int *p, **A;
+  A = malloc(numrows*sizeof(int *));
 
   // build a permuted row index
   p = M->matrix;
@@ -297,8 +301,10 @@ int test_corank_mod_p(matrix_t *M, int threshold){
     // if there are none, increase the corank and continue
     if (k == numrows) {
       ++corank;
-      if (corank > threshold)
+      if (corank > threshold){
+	free(A);
 	return -1;
+      }
     }
 
     else{
@@ -323,6 +329,7 @@ int test_corank_mod_p(matrix_t *M, int threshold){
       // but if we reached the last row then all rows are independent
       if (i == numrows) {
 	corank = numcols - numrows;
+	free(A);
 	if (corank > threshold)
 	  return -1;
 	else
@@ -331,6 +338,7 @@ int test_corank_mod_p(matrix_t *M, int threshold){
 
     } // end else
   } // end for j
+  free(A);
   return corank;
 }
 
