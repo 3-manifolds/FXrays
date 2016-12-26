@@ -4,10 +4,10 @@ environment:
 
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
-    # The list here is complete (excluding Python 2.6, which
-    # isn't covered by this document) at the time of writing.
 
     - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python35"
 
 install:
   # These Python packages are needed to build FXrays
