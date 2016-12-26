@@ -12,10 +12,9 @@ environment:
 install:
   # These Python packages are needed to build FXrays
   - "%PYTHON%\\python.exe -m pip install Cython wheel"
-
-build:
-
   - "%PYTHON%\\python.exe setup.py install"
+  
+build: none
   
 test_script:
   # Put your test command here.
