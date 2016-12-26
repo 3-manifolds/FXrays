@@ -23,11 +23,18 @@ Fukuda's.
 import os, re, sys
 from setuptools import setup, Command, Extension
 
+if sys.platform.startswith('win'):
+    extra_compile_args = ['-Dinline=__inline']
+else:
+    extra_compile_args=['-O3', '-funroll-loops']
+
 FXrays = Extension(
     name = 'FXrays.FXraysmodule',
     sources = ['cython_src/FXraysmodule.c', 'c_src/FXrays.c'],
     include_dirs = ['cython_src', 'c_src'], 
-    extra_compile_args=['-O3', '-funroll-loops'])
+    extra_compile_args = extra_compile_args
+)
+    
 
 class clean(Command):
     """
@@ -39,7 +46,7 @@ class clean(Command):
     def finalize_options(self):
         pass
     def run(self):
-        os.system('rm -rf build dist *.pyc FXrays.egg-info')
+        os.system('rm -rf build dist *.pyc cython_src/*.c FXrays.egg-info')
 
 # If have Cython, check that .c files are up to date:
 
