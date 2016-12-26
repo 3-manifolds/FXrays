@@ -6,11 +6,12 @@ environment:
     # http://www.appveyor.com/docs/installed-software#python
 
     - PYTHON: "C:\\Python27"
-    - PYTHON: "C:\\Python27-x64"
-    - PYTHON: "C:\\Python35"
+    #- PYTHON: "C:\\Python27-x64"
+    #- PYTHON: "C:\\Python35"
 
 install:
   # These Python packages are needed to build FXrays
+  - "%PYTHON%\\python.exe -m pip install --upgrade pip setuptools"
   - "%PYTHON%\\python.exe -m pip install Cython wheel"
   - "%PYTHON%\\python.exe setup.py install"
   
