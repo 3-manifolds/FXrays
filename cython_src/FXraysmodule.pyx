@@ -72,7 +72,7 @@ def find_Xrays(int rows, int columns, matrix, modp=False,
     modp (optional, default False): Whether to do the computation
     over p = 2^31 - 1 rather than Z.
 
-    filter (optional, default True): Return only those extremal rays
+    filtering (optional, default True): Return only those extremal rays
     corresponding to embedded surfaces in quad coordinates.  That is,
     if V is the vector corresponding to the ray, then for each triple
     V[3*i:3*(i+1)] at most one entry is non-zero.
