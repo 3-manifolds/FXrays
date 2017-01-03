@@ -98,7 +98,7 @@ void *print_vertices(vertex_stack_t *stack, int dimension);
 
 //primitives defined in mmx.c
 int    extract_matrix(matrix_t *in, int rows, support_t *support, matrix_t *out);
-int    filter(vertex_t *v, filter_list_t *filter_list);
+int    FXrays_filter_function(vertex_t *v, filter_list_t *filter_list);
 int    ax_plus_by(int size, int a, int b, int *x, int *y);
 void   ax_plus_by_mod_p(int size, int a, int b, int *x, int *y);
 int    dot(int size, int *x, int *y, int *dotprod);
