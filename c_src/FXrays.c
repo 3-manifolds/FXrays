@@ -383,7 +383,7 @@ void destroy_filter_list(filter_list_t *filterlist){
 // the support of the last filter intersected with the complement of
 // the support of the vector.
 
-int filter(vertex_t *v, filter_list_t *filter_list){
+int FXrays_filter_function(vertex_t *v, filter_list_t *filter_list){
   int size;
   support_t *filter;
   register int CS0, CS1, CS2, CS3, result=0;
@@ -458,7 +458,7 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_prog
 
 	support_union(&P->support, &N->support, &vertex->support);
 
-	if (filter(vertex, filter_list) != 0) {
+	if (FXrays_filter_function(vertex, filter_list) != 0) {
 	  if (extract_matrix(matrix, slice+1, &vertex->support, temp_matrix) == 1
               && test_corank(temp_matrix, 1) == 1){
 	    for ( i=0; i<dimension; i++ )
@@ -549,7 +549,7 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int prin
 
 	support_union(&P->support, &N->support, &vertex->support);
 
-	if (filter(vertex, filter_list) != 0) {
+	if (FXrays_filter_function(vertex, filter_list) != 0) {
         if (extract_matrix(mod_p_matrix, slice+1, &vertex->support, temp_matrix) == 1
 	    && test_corank_mod_p(temp_matrix, 1) == 1){
 	    for ( i=0; i<dimension; i++ )
