@@ -25,5 +25,5 @@ int main(){
   int i;
 
   testfilter = NULL;
-  find_vertices((matrix_t *)&testmatrix, testfilter, 1, print_vertices);
+  FXrays_find_vertices((matrix_t *)&testmatrix, testfilter, 1, FXrays_print_vertices);
 }
