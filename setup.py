@@ -28,11 +28,17 @@ if sys.platform.startswith('win'):
 else:
     extra_compile_args=['-O3', '-funroll-loops']
 
+if sys.platform.startswith('linux'):
+    extra_link_args=['-Wl,-Bsymbolic-functions', '-Wl,-Bsymbolic']
+else:
+    extra_link_args=[]
+
 FXrays = Extension(
     name = 'FXrays.FXraysmodule',
     sources = ['cython_src/FXraysmodule.c', 'c_src/FXrays.c'],
     include_dirs = ['cython_src', 'c_src'], 
-    extra_compile_args = extra_compile_args
+    extra_compile_args = extra_compile_args,
+    extra_link_args = extra_link_args
 )
     
 
