@@ -13,16 +13,49 @@ $Id$
 #include <string.h>
 #include "FXrays.h"
 
+
+
+
 static void no_memory(void);
 static void add_block(reservoir_t *reservoir);
-
 static void no_memory(void){
   fprintf(stderr, "No memory.\n");
   exit(ENOMEM);
 }
 
+//reservoirs
+static reservoir_t *new_reservoir(int dimension);
+static void         destroy_reservoir(reservoir_t *reservoir);
 
-reservoir_t *new_reservoir(int dimension){
+//vertices
+static vertex_t *new_vertex(reservoir_t *reservoir);
+static void      push_vertex(vertex_t *vertex, vertex_stack_t *stack);
+static vertex_t *pop_vertex(vertex_stack_t *stack);
+static void      recycle_vertices(vertex_stack_t *stack, reservoir_t *reservoir);
+static vertex_t *unit_vertex(unsigned int index, reservoir_t *reservoir);
+static void      reduce(int dimension, vertex_t *v);
+
+//supports
+static void support_union(support_t *x, support_t *y, support_t *result);
+static void set_support(unsigned int index, support_t *support);
+
+//components of the algorithm
+static void evaluate(matrix_t *A, int row, vertex_t *v); 
+static int  test_corank(matrix_t *A, int threshold);
+static int  test_corank_mod_p(matrix_t *A, int threshold);
+
+
+// core functions, formerly in mmx.c
+static int  extract_matrix(matrix_t *in, int rows, support_t *support, matrix_t *out);
+static int  filter(vertex_t *v, filter_list_t *filter_list);
+static int  ax_plus_by(int size, int a, int b, int *x, int *y);
+static void ax_plus_by_mod_p(int size, int a, int b, int *x, int *y);
+static int  dot(int size, int *x, int *y, int *dotprod);
+
+
+
+
+static reservoir_t *new_reservoir(int dimension){
   reservoir_t *result = calloc(1, sizeof(reservoir_t));
 
   if (result == NULL)
@@ -33,7 +66,7 @@ reservoir_t *new_reservoir(int dimension){
 }
 
 
-void destroy_reservoir(reservoir_t *reservoir){
+static void destroy_reservoir(reservoir_t *reservoir){
   block_t *first_block, *next_block;
 
   if (reservoir == NULL)
@@ -70,7 +103,7 @@ static void add_block(reservoir_t *reservoir){
 }
 
 
-vertex_t *new_vertex(reservoir_t *reservoir){
+static vertex_t *new_vertex(reservoir_t *reservoir){
   vertex_t *result = reservoir->first_vertex;
 
   if (result != NULL){
@@ -85,12 +118,12 @@ vertex_t *new_vertex(reservoir_t *reservoir){
   }
 }
 
-void push_vertex(vertex_t *vertex, vertex_stack_t *stack){
+static void push_vertex(vertex_t *vertex, vertex_stack_t *stack){
   vertex->next = *stack;
   *stack = vertex;
 }
 
-vertex_t *pop_vertex(vertex_stack_t *stack){
+static vertex_t *pop_vertex(vertex_stack_t *stack){
   vertex_t *result = *stack;
 
   if (result != NULL) {
@@ -101,7 +134,7 @@ vertex_t *pop_vertex(vertex_stack_t *stack){
 }
 
 
-void recycle_vertices(vertex_stack_t *stack, reservoir_t *reservoir){
+static void recycle_vertices(vertex_stack_t *stack, reservoir_t *reservoir){
   vertex_t *v = *stack;
 
   if (v == NULL)
@@ -115,7 +148,7 @@ void recycle_vertices(vertex_stack_t *stack, reservoir_t *reservoir){
   *stack = NULL;
 }
 
-void set_support(unsigned int index, support_t *support){
+static void set_support(unsigned int index, support_t *support){
   int i;
 
   if (index & (0x01 != 0))
@@ -125,7 +158,7 @@ void set_support(unsigned int index, support_t *support){
   support->supp[i] |= (1 << (0x1f & (index >> 1)) );
 }
 
-vertex_t *unit_vertex(unsigned int index, reservoir_t *reservoir){
+static vertex_t *unit_vertex(unsigned int index, reservoir_t *reservoir){
   vertex_t *result;
 
   result = new_vertex(reservoir);
@@ -149,7 +182,7 @@ inline int gcd(int x, int y){
   return x;
 }
 
-void reduce(int dimension, vertex_t *v){
+static void reduce(int dimension, vertex_t *v){
   int *a = v->vector;
   int i = dimension, j = i;
   int x, d = a[i - 1];
@@ -169,21 +202,21 @@ void reduce(int dimension, vertex_t *v){
   }
 }
 
-void evaluate(matrix_t *A, int row, vertex_t *v){
+static void evaluate(matrix_t *A, int row, vertex_t *v){
   int size = A->columns;
 
   if ( dot(size, A->matrix + size*row, v->vector, &v->value) !=0 )
        fprintf(stderr, "Overflow in dot product!\n");
 }
 
-void support_union(support_t *x, support_t *y, support_t *result){
+static void support_union(support_t *x, support_t *y, support_t *result){
   int i;
   for (i=0; i <4; i++) {
     result->supp[i] = x->supp[i] | y->supp[i];
   }
 }
 
-matrix_t *new_matrix(int rows, int columns){
+static matrix_t *new_matrix(int rows, int columns){
   matrix_t *result;
 
   result = (matrix_t *)calloc(1, sizeof(matrix_t) + (rows*columns + 1)*sizeof(int));
@@ -192,25 +225,20 @@ matrix_t *new_matrix(int rows, int columns){
   return result;
 };
 
-void destroy_matrix(matrix_t *matrix){
+matrix_t *FXrays_new_matrix(int rows, int columns){
+    return new_matrix(rows, columns);
+}
+
+static void destroy_matrix(matrix_t *matrix){
   if (matrix != NULL)
     free(matrix);
 };
 
-/* 
-static void print_matrix(matrix_t *matrix){
-  int i,j, *p = matrix->matrix;
+void FXrays_destroy_matrix(matrix_t *matrix){
+    return destroy_matrix(matrix);
+};
 
-  for (i=0; i<matrix->rows; i++){ 
-    for(j=0; j<matrix->columns; j++)
-      printf("%d ", *p++);
-    printf("\n");
-  }
-  printf("\n");
-}
-*/
-
-int test_corank(matrix_t *M, int threshold){
+static int test_corank(matrix_t *M, int threshold){
   int i, j, k, a, b, d;
   int corank = 0;
   int numcols = M->columns, numrows = M->rows;
@@ -277,7 +305,7 @@ int test_corank(matrix_t *M, int threshold){
 
 
 // This computation is done mod p = 2^31 -1
-int test_corank_mod_p(matrix_t *M, int threshold){
+static int test_corank_mod_p(matrix_t *M, int threshold){
   int i, j, k, a, b;
   int corank = 0;
   int numcols = M->columns, numrows = M->rows;
@@ -342,7 +370,7 @@ int test_corank_mod_p(matrix_t *M, int threshold){
   return corank;
 }
 
-filter_list_t *embedded_filter(int tets){
+filter_list_t *FXrays_embedded_filter(int tets){
   filter_list_t *result;
   int i,size = 3*tets;
 
@@ -371,7 +399,7 @@ filter_list_t *embedded_filter(int tets){
   return result;
 }
 
-void destroy_filter_list(filter_list_t *filterlist){
+void FXrays_destroy_filter_list(filter_list_t *filterlist){
   if (filterlist != NULL)
     free(filterlist);
 };
@@ -383,7 +411,7 @@ void destroy_filter_list(filter_list_t *filterlist){
 // the support of the last filter intersected with the complement of
 // the support of the vector.
 
-int FXrays_filter_function(vertex_t *v, filter_list_t *filter_list){
+static int filter(vertex_t *v, filter_list_t *filter_list){
   int size;
   support_t *filter;
   register int CS0, CS1, CS2, CS3, result=0;
@@ -410,7 +438,7 @@ int FXrays_filter_function(vertex_t *v, filter_list_t *filter_list){
   return result;
 }
 
-void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress,
+void *FXrays_find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress,
 		    void *(*output_func)(vertex_stack_t *stack, int dimension)){
   void *result;
   int i, dimension = matrix->columns;
@@ -458,7 +486,7 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_prog
 
 	support_union(&P->support, &N->support, &vertex->support);
 
-	if (FXrays_filter_function(vertex, filter_list) != 0) {
+	if (filter(vertex, filter_list) != 0) {
 	  if (extract_matrix(matrix, slice+1, &vertex->support, temp_matrix) == 1
               && test_corank(temp_matrix, 1) == 1){
 	    for ( i=0; i<dimension; i++ )
@@ -492,7 +520,7 @@ void *find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_prog
   return result;
 }
 
-void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
+void *FXrays_find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
 			  void *(*output_func)(vertex_stack_t *stack, int dimension) ){
   void *result;
   int i, x, dimension = matrix->columns, size = dimension*matrix->rows;
@@ -549,7 +577,7 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int prin
 
 	support_union(&P->support, &N->support, &vertex->support);
 
-	if (FXrays_filter_function(vertex, filter_list) != 0) {
+	if (filter(vertex, filter_list) != 0) {
         if (extract_matrix(mod_p_matrix, slice+1, &vertex->support, temp_matrix) == 1
 	    && test_corank_mod_p(temp_matrix, 1) == 1){
 	    for ( i=0; i<dimension; i++ )
@@ -584,7 +612,7 @@ void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int prin
   return result;
 }
 
-void *print_vertices(vertex_stack_t *stack, int dimension){
+void *FXrays_print_vertices(vertex_stack_t *stack, int dimension){
   vertex_t *V = *stack;
   int i;
 
@@ -600,7 +628,7 @@ void *print_vertices(vertex_stack_t *stack, int dimension){
 // Computational primitives
 
 // This computation is done mod p = 2^31 -1
-void ax_plus_by_mod_p(int size, int a, int b, int *x, int *y){
+static void ax_plus_by_mod_p(int size, int a, int b, int *x, int *y){
 
   register int A = a, B = b;
   register unsigned int S;
@@ -626,8 +654,7 @@ void ax_plus_by_mod_p(int size, int a, int b, int *x, int *y){
 // and their sum are computed as 64 bit numbers.  So the products can
 // overflow without causing an overflow of the final linear combination.
 
-int ax_plus_by(int size, int a, int b, int *x, int *y){
-
+static int ax_plus_by(int size, int a, int b, int *x, int *y){
   register int A = a, B = b;
   register int *X = x, *Y = y;
   register long long prod;
@@ -644,7 +671,7 @@ int ax_plus_by(int size, int a, int b, int *x, int *y){
 // This returns a non-zero value if any partial sum of the dot product
 // overflows a 32 bit integer.
 
-int dot(int size, int *x, int *y, int *dotprod){
+static int dot(int size, int *x, int *y, int *dotprod){
   register int result = 0;
   register int *X = x, *Y = y;
   register long long accumulator = 0;
@@ -668,7 +695,7 @@ int dot(int size, int *x, int *y, int *dotprod){
 // To avoid unpredictable branching, we just overwrite each of the
 // columns that corresponds to a 0 in the support vector.
 
-int extract_matrix(matrix_t *in, int rows, support_t *support, matrix_t *out) {
+static int extract_matrix(matrix_t *in, int rows, support_t *support, matrix_t *out) {
   register int *in_coeff = in->matrix;
   register int *out_coeff = out->matrix;
   register int supp1, supp2, temp;
