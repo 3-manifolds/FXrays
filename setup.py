@@ -23,8 +23,18 @@ Fukuda's.
 import os, re, sys
 from setuptools import setup, Command, Extension
 
+extra_link_args = []
 if sys.platform.startswith('win'):
-    extra_compile_args = ['-Dinline=__inline']
+    extra_compile_args = ['-Dinline=__inline',
+                          '-D__USE_MINGW_ANSI_STDIO',
+                          '-Dprintf=__MINGW_PRINTF_FORMAT']
+    if sys.maxsize > 2**32:
+        extra_compile_args += ['-DMS_WIN64']
+    link_args = ['-Wl,--subsystem,windows']
+    if sys.version_info.major < 3:
+        extra_link_args.append('-specs=specs90')
+    else:
+        extra_link_args.append('-specs=specs100')
 else:
     extra_compile_args=['-O3', '-funroll-loops']
 
@@ -32,7 +42,8 @@ FXrays = Extension(
     name = 'FXrays.FXraysmodule',
     sources = ['cython_src/FXraysmodule.c', 'c_src/FXrays.c'],
     include_dirs = ['cython_src', 'c_src'], 
-    extra_compile_args = extra_compile_args
+    extra_compile_args = extra_compile_args,
+    extra_link_args = extra_link_args
 )
     
 
