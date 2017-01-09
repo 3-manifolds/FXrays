@@ -20,9 +20,8 @@ int main(){
   matrix_t *testmatrix = (matrix_t*)&testdata;
   int i;
 
-  testfilter = embedded_filter(testmatrix->columns/3);
-  find_vertices(testmatrix, testfilter, 1, print_vertices);
-
+  testfilter = FXrays_embedded_filter(testmatrix->columns/3);
+  FXrays_find_vertices(testmatrix, testfilter, 1, FXrays_print_vertices);
 }
 
 

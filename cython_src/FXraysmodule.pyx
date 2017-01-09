@@ -23,15 +23,15 @@ cdef extern from "FXrays.h":
         int matrix[0]
     ctypedef matrix_s matrix_t
 
-    matrix_t *new_matrix(int rows, int columns)
-    void destroy_matrix(matrix_t *matrix)
-    filter_list_t *embedded_filter(int tets)
-    void destroy_filter_list(filter_list_t *filterlist)
+    matrix_t *FXrays_new_matrix(int rows, int columns)
+    void FXrays_destroy_matrix(matrix_t *matrix)
+    filter_list_t *FXrays_embedded_filter(int tets)
+    void FXrays_destroy_filter_list(filter_list_t *filterlist)
     
-    void* find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
+    void* FXrays_find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
                     void *(*output_func)(vertex_stack_t *stack, int dimension))
     
-    void *find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
+    void *FXrays_find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
                           void *(*output_func)(vertex_stack_t *stack, int dimension))
 
 
@@ -81,27 +81,27 @@ def find_Xrays(int rows, int columns, matrix, modp=False,
     statistics on the progress of the computation.
     """
     cdef filter_list_t *filter = NULL
-    cdef matrix_t *c_matrix = new_matrix(rows, columns)
+    cdef matrix_t *c_matrix = FXrays_new_matrix(rows, columns)
 
     if rows < 0 or columns < 0 or len(matrix) != rows*columns:
         raise ValueError('rows*columns != length of matrix list.')
 
     if filtering:
-        filter = embedded_filter(columns/3)
+        filter = FXrays_embedded_filter(columns/3)
 
     for i, c in enumerate(matrix):
         c_matrix.matrix[i] = c
 
     if modp:
-        result = <object> find_vertices_mod_p(c_matrix, filter,
+        result = <object> FXrays_find_vertices_mod_p(c_matrix, filter,
                                               print_progress, build_vertex_list)
     else:
-        result = <object> find_vertices(c_matrix, filter,
+        result = <object> FXrays_find_vertices(c_matrix, filter,
                                         print_progress, build_vertex_list)
 
     if filtering:
-        destroy_filter_list(filter)
-    destroy_matrix(c_matrix)
+        FXrays_destroy_filter_list(filter)
+    FXrays_destroy_matrix(c_matrix)
     return result
         
     

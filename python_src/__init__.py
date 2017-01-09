@@ -8,7 +8,7 @@ general extremal ray problems.
 
 from .FXraysmodule import find_Xrays
 
-__version__ = '1.3.3a3'
+__version__ = '1.3.3b1'
 
 def version():
     return __version__
