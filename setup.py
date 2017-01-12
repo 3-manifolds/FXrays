@@ -20,7 +20,7 @@ The algorithm is due to Dave Letscher, and incorporates ideas of Komei
 Fukuda's.
 """
 
-import os, re, sys, sysconfig
+import os, re, sys, sysconfig, shutil, subprocess
 from setuptools import setup, Command, Extension
 
 extra_link_args = []
@@ -75,6 +75,62 @@ class FXraysTest(Command):
         from FXrays.test import runtests
         sys.exit(runtests())
 
+if sys.platform == 'win32':
+    pythons = [
+        r'C:\Python27\python.exe',
+        r'C:\Python27-x64\python.exe',
+# Appveyor has these:
+#        r'C:\Python34\python.exe',
+#        r'C:\Python34-x64\python.exe',
+#        r'C:\Python35\python.exe',
+#        r'C:\Python35-x64\python.exe',
+#        r'C:\Python36\python.exe',
+#        r'C:\Python36-x64\python.exe',
+        ]
+elif sys.platform == 'darwin':
+    pythons = [
+        'python2.7',
+        'python3.4',
+        'python3.5',
+        'python3.6',
+        ]
+else:
+    pythons = [
+        'python2.7',
+        'python3.5'
+    ]
+
+class FXraysRelease(Command):
+    user_options = []
+    def initialize_options(self):
+        pass 
+    def finalize_options(self):
+        pass
+    def run(self):
+        if os.path.exists('build'):
+            shutil.rmtree('build')
+        if os.path.exists('dist'):
+            shutil.rmtree('dist')
+        for python in pythons:
+            try:
+                subprocess.check_call([python, 'setup.py', 'build'])
+            except subprocess.CalledProcessError:
+                print('Build failed for %s.'%python)
+                sys.exit(1)
+            try:
+                subprocess.check_call([python, 'setup.py', 'test'])
+            except subprocess.CalledProcessError:
+                print('Test failed for %s.'%python)
+                sys.exit(1)
+            try:
+                subprocess.check_call([python, 'setup.py', 'bdist_wheel'])
+            except subprocess.CalledProcessError:
+                print('Error building wheel for %s.'%python)
+        try:
+            subprocess.check_call(['python', 'setup.py', 'sdist'])
+        except subprocess.CalledProcessError:
+            print('Error building sdist archive for %s.'%python)
+
 # If have Cython, check that .c files are up to date:
 
 try:
@@ -114,7 +170,9 @@ setup(
     packages = ['FXrays'],
     package_dir = {'FXrays':'python_src'}, 
     ext_modules = [FXrays],
-    cmdclass = {'clean':FXraysClean, 'test':FXraysTest},
+    cmdclass = {'clean':FXraysClean,
+                'test':FXraysTest,
+                'release':FXraysRelease},
     zip_safe=False, 
 )
 
