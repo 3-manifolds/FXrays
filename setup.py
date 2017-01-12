@@ -20,21 +20,15 @@ The algorithm is due to Dave Letscher, and incorporates ideas of Komei
 Fukuda's.
 """
 
-import os, re, sys
+import os, re, sys, sysconfig
 from setuptools import setup, Command, Extension
 
 extra_link_args = []
+extra_compile_args = []
 if sys.platform.startswith('win'):
-    extra_compile_args = ['-Dinline=__inline',
-                          '-D__USE_MINGW_ANSI_STDIO',
-                          '-Dprintf=__MINGW_PRINTF_FORMAT']
-    if sys.maxsize > 2**32:
-        extra_compile_args += ['-DMS_WIN64']
-    link_args = ['-Wl,--subsystem,windows']
-    if sys.version_info.major < 3:
-        extra_link_args.append('-specs=specs90')
-    else:
-        extra_link_args.append('-specs=specs100')
+    # NOTE: this is for msvc not mingw32
+    # There are issues with mingw64 linking agains msvcrt.
+    extra_compile_args = ['/Ox']
 else:
     extra_compile_args=['-O3', '-funroll-loops']
 
@@ -52,7 +46,7 @@ FXrays = Extension(
 )
     
 
-class clean(Command):
+class FXraysClean(Command):
     """
     Clean *all* the things!
     """
@@ -63,6 +57,23 @@ class clean(Command):
         pass
     def run(self):
         os.system('rm -rf build dist *.pyc cython_src/*.c FXrays.egg-info')
+
+class FXraysTest(Command):
+    user_options = []
+    def initialize_options(self):
+        pass 
+    def finalize_options(self):
+        pass
+    def run(self):
+        build_lib_dir = os.path.join(
+            'build',
+            'lib.{platform}-{version_info[0]}.{version_info[1]}'.format(
+                platform=sysconfig.get_platform(),
+                version_info=sys.version_info)
+        )
+        sys.path.insert(0, build_lib_dir)
+        from FXrays.test import runtests
+        sys.exit(runtests())
 
 # If have Cython, check that .c files are up to date:
 
@@ -103,7 +114,7 @@ setup(
     packages = ['FXrays'],
     package_dir = {'FXrays':'python_src'}, 
     ext_modules = [FXrays],
-    cmdclass = {'clean':clean},
+    cmdclass = {'clean':FXraysClean, 'test':FXraysTest},
     zip_safe=False, 
 )
 

@@ -212,7 +212,9 @@ def t12345_matrix():
 
     return rows, columns, matrix
 
-if __name__ == '__main__':
+def runtests():
     import doctest
     doctest.testmod()
 
+if __name__ == '__main__':
+    runtests()

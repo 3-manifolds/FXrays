@@ -168,7 +168,11 @@ static vertex_t *unit_vertex(unsigned int index, reservoir_t *reservoir){
   return result;
 }
 
+#ifdef GCC
 inline int gcd(int x, int y){
+#else
+__inline int gcd(int x, int y){
+#endif
   int r;
   if (x == 0)
     return y;
@@ -235,7 +239,7 @@ static void destroy_matrix(matrix_t *matrix){
 };
 
 void FXrays_destroy_matrix(matrix_t *matrix){
-    return destroy_matrix(matrix);
+    destroy_matrix(matrix);
 };
 
 static int test_corank(matrix_t *M, int threshold){
@@ -637,11 +641,11 @@ static void ax_plus_by_mod_p(int size, int a, int b, int *x, int *y){
 
   while (size--) {
     prod = ((long long)(*Y))*((long long)B);
-    S = (prod & 0x7fffffff) + (prod >> 31);
+    S = (unsigned int)(prod & 0x7fffffff) + (unsigned int)(prod >> 31);
     if (S >= (unsigned int)PRIME) S -= PRIME;
     *Y = S;
     prod = ((long long)(*X++))*((long long)A);
-    S = (prod & 0x7fffffff) + (prod >> 31);
+    S = (unsigned int)(prod & 0x7fffffff) + (unsigned int)(prod >> 31);
     if (S >= (unsigned int)PRIME) S -= PRIME;
     S += *Y;
     if (S >= (unsigned int)PRIME) S -= PRIME;
@@ -700,7 +704,7 @@ static int extract_matrix(matrix_t *in, int rows, support_t *support, matrix_t *
   register int *out_coeff = out->matrix;
   register int supp1, supp2, temp;
   int count1, count2, count, columns_out = 0;
-
+  
   if (in->columns > 64){
     count1 = 64;
     count2 = in->columns - 64;
@@ -733,11 +737,11 @@ static int extract_matrix(matrix_t *in, int rows, support_t *support, matrix_t *
     supp1 = supp2;
     supp2 = temp;
   }
-  columns_out = out_coeff - out->matrix;
+  columns_out = (int)(out_coeff - out->matrix);
   // Bail out if there aren't enough rows for the co-rank to be 1.
   if (rows < columns_out - 1)
     return 0;
-  out->columns = columns_out;
+  out->columns = (int)columns_out;
   // Otherwise extract the rest of the rows.
   while (--rows) {
     supp1 = support->supp[0];
