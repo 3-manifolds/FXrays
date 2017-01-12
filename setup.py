@@ -20,7 +20,7 @@ The algorithm is due to Dave Letscher, and incorporates ideas of Komei
 Fukuda's.
 """
 
-import os, re, sys, sysconfig, shutil, subprocess
+import os, re, sys, sysconfig, shutil, subprocess, site
 from setuptools import setup, Command, Extension
 
 extra_link_args = []
@@ -88,6 +88,13 @@ if sys.platform == 'win32':
 #        r'C:\Python36-x64\python.exe',
         ]
 elif sys.platform == 'darwin':
+    pythons = [
+        'python2.7',
+        'python3.4',
+        'python3.5',
+        'python3.6',
+        ]
+elif site.__file__.startswith('/opt/python/cp'):
     pythons = [
         'python2.7',
         'python3.4',
