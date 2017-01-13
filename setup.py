@@ -129,38 +129,45 @@ class FXraysRelease(Command):
             try:
                 subprocess.check_call([python, 'setup.py', 'build'])
             except subprocess.CalledProcessError:
-                print('Build failed for %s.'%python)
+                raise RuntimeError('Build failed for %s.'%python)
                 sys.exit(1)
             try:
                 subprocess.check_call([python, 'setup.py', 'test'])
             except subprocess.CalledProcessError:
-                print('Test failed for %s.'%python)
+                raise RuntimeError('Test failed for %s.'%python)
                 sys.exit(1)
             try:
                 subprocess.check_call([python, 'setup.py', 'bdist_wheel'])
             except subprocess.CalledProcessError:
-                print('Error building wheel for %s.'%python)
+                raise RuntimeError('Error building wheel for %s.'%python)
         if sys.platform.startswith('linux'):
+            # auditwheel generates names with more tags than allowed by pypi
             extra_tag = re.compile('linux_x86_64\.|linux_i686\.')
             # build wheels tagged as manylinux1
             for wheelname in [name for name in os.listdir('dist') if name.endswith('.whl')]:
-                distpath = os.path.join('dist', wheelname)
-                subprocess.check_call(['auditwheel', 'addtag', '-w', 'dist', distpath])
-                os.remove(distpath)
+                original_path = os.path.join('dist', wheelname)
+                subprocess.check_call(['auditwheel', 'addtag', '-w', 'dist', original_path])
+                os.remove(original_path)
         else:
             extra_tag = None
         version = re.compile('-([^-]*)-')
-        for wheelname in [name for name in os.listdir('dist') if name.endswith('.whl')]:
+        for wheel_name in [name for name in os.listdir('dist') if name.endswith('.whl')]:
+            new_name = wheel_name
             if extra_tag:
-                newname = extra_tag.sub('', wheelname)
+                new_name = extra_tag.sub('', new_name, 1)
             if self.rctag:
-                newname = version.sub('-\g<1>%s-'%self.rctag, newname, 1)
-            os.rename(os.path.join('dist', wheelname),
-                          os.path.join('dist', newname))
+                new_name = version.sub('-\g<1>%s-'%self.rctag, new_name, 1)
+            os.rename(os.path.join('dist', wheel_name), os.path.join('dist', new_name))
         try:
             subprocess.check_call(['python', 'setup.py', 'sdist'])
         except subprocess.CalledProcessError:
-            print('Error building sdist archive for %s.'%python)
+            raise RuntimeError('Error building sdist archive for %s.'%python)
+        sdist_version = re.compile('-([^-]*)(.tar.gz)|-([^-]*)(.zip)')
+        for archive_name in [name for name in os.listdir('dist')
+                             if name.endswith('tar.gz') or name.endswith('.zip')]:
+            if self.rctag:
+                new_name = sdist_version.sub('-\g<1>%s\g<2>'%self.rctag, archive_name, 1)
+                os.rename(os.path.join('dist', archive_name), os.path.join('dist', new_name))
 
 # If have Cython, check that .c files are up to date:
 
