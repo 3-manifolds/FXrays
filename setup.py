@@ -23,6 +23,10 @@ Fukuda's.
 import os, re, sys, sysconfig, shutil, subprocess, site
 from setuptools import setup, Command, Extension
 
+# Get version number from module
+version = re.search("__version__ = '(.*)'",
+                    open('python_src/__init__.py').read()).group(1)
+
 extra_link_args = []
 extra_compile_args = []
 if sys.platform.startswith('win'):
@@ -44,7 +48,6 @@ FXrays = Extension(
     extra_compile_args = extra_compile_args,
     extra_link_args = extra_link_args
 )
-    
 
 class FXraysClean(Command):
     """
@@ -108,11 +111,15 @@ else:
     ]
 
 class FXraysRelease(Command):
-    user_options = []
+    # The -rX option modifies the wheel name by adding rcX to the version string.
+    # This is for uploading to testpypi, which will not allow uploading two
+    # wheels with the same name.
+    user_options = [('rctag=', 'r', 'index for rc tag to be appended to version (e.g. -r2 -> rc2)')]
     def initialize_options(self):
-        pass 
+        self.rctag = None
     def finalize_options(self):
-        pass
+        if self.rctag:
+            self.rctag = 'rc%s'%self.rctag
     def run(self):
         if os.path.exists('build'):
             shutil.rmtree('build')
@@ -133,6 +140,23 @@ class FXraysRelease(Command):
                 subprocess.check_call([python, 'setup.py', 'bdist_wheel'])
             except subprocess.CalledProcessError:
                 print('Error building wheel for %s.'%python)
+        if sys.platform.startswith('linux'):
+            extra_tag = re.compile('linux_x86_64\.|linux_i686\.')
+            # build wheels tagged as manylinux1
+            for wheelname in [name for name in os.listdir('dist') if name.endswith('.whl')]:
+                distpath = os.path.join('dist', wheelname)
+                subprocess.check_call(['auditwheel', 'addtag', '-w', 'dist', distpath])
+                os.remove(distpath)
+        else:
+            extra_tag = None
+        version = re.compile('-([^-]*)-')
+        for wheelname in [name for name in os.listdir('dist') if name.endswith('.whl')]:
+            if extra_tag:
+                newname = extra_tag.sub('', wheelname)
+            if self.rctag:
+                newname = version.sub('-\g<1>%s-'%self.rctag, newname, 1)
+            os.rename(os.path.join('dist', wheelname),
+                          os.path.join('dist', newname))
         try:
             subprocess.check_call(['python', 'setup.py', 'sdist'])
         except subprocess.CalledProcessError:
@@ -149,10 +173,6 @@ try:
 except ImportError:
     pass 
 
-
-# Get version number from module
-version = re.search("__version__ = '(.*)'",
-                    open('python_src/__init__.py').read()).group(1)
 
 setup(
     name = 'FXrays',
