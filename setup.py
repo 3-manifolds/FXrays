@@ -104,6 +104,10 @@ elif site.__file__.startswith('/opt/python/cp'):
         'python3.5',
         'python3.6',
         ]
+elif site.getuserbase().find('/.sage/') > -1:
+    pythons = [
+        'sage -python',
+        ]
 else:
     pythons = [
         'python2.7',
