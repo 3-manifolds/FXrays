@@ -1,6 +1,3 @@
-import os, re
-from setuptools import setup, Command, Extension
-
 long_description =  """\
 This package is a small, fast implementation of an algorithm for
 finding extremal rays of a polyhedral cone, with filtering.  It is
@@ -23,13 +20,36 @@ The algorithm is due to Dave Letscher, and incorporates ideas of Komei
 Fukuda's.
 """
 
-FXrays = Extension(
-    name = 'FXrays.FXrays',
-    sources = ['c_src/FXraysmodule.c', 'c_src/FXrays.c'],
-    include_dirs = ['c_src'], 
-    extra_compile_args=['-O3', '-funroll-loops'])
+import os, re, sys, sysconfig, shutil, subprocess, site
+from setuptools import setup, Command, Extension
 
-class clean(Command):
+# Get version number from module
+version = re.search("__version__ = '(.*)'",
+                    open('python_src/__init__.py').read()).group(1)
+
+extra_link_args = []
+extra_compile_args = []
+if sys.platform.startswith('win'):
+    # NOTE: this is for msvc not mingw32
+    # There are issues with mingw64 linking agains msvcrt.
+    extra_compile_args = ['/Ox']
+else:
+    extra_compile_args=['-O3', '-funroll-loops']
+
+if sys.platform.startswith('linux'):
+    extra_link_args=['-Wl,-Bsymbolic-functions', '-Wl,-Bsymbolic']
+else:
+    extra_link_args=[]
+
+FXrays = Extension(
+    name = 'FXrays.FXraysmodule',
+    sources = ['cython_src/FXraysmodule.c', 'c_src/FXrays.c'],
+    include_dirs = ['cython_src', 'c_src'], 
+    extra_compile_args = extra_compile_args,
+    extra_link_args = extra_link_args
+)
+
+class FXraysClean(Command):
     """
     Clean *all* the things!
     """
@@ -39,12 +59,127 @@ class clean(Command):
     def finalize_options(self):
         pass
     def run(self):
-        os.system('rm -rf build dist *.pyc FXrays.egg-info')
+        os.system('rm -rf build dist *.pyc cython_src/*.c FXrays.egg-info')
 
+class FXraysTest(Command):
+    user_options = []
+    def initialize_options(self):
+        pass 
+    def finalize_options(self):
+        pass
+    def run(self):
+        build_lib_dir = os.path.join(
+            'build',
+            'lib.{platform}-{version_info[0]}.{version_info[1]}'.format(
+                platform=sysconfig.get_platform(),
+                version_info=sys.version_info)
+        )
+        sys.path.insert(0, build_lib_dir)
+        from FXrays.test import runtests
+        sys.exit(runtests())
 
-# Get version number from module
-version = re.search("__version__ = '(.*)'",
-                    open('python_src/__init__.py').read()).group(1)
+if sys.platform == 'win32':
+    pythons = [
+        r'C:\Python27\python.exe',
+        r'C:\Python27-x64\python.exe',
+# Appveyor has these:
+#        r'C:\Python34\python.exe',
+#        r'C:\Python34-x64\python.exe',
+#        r'C:\Python35\python.exe',
+#        r'C:\Python35-x64\python.exe',
+#        r'C:\Python36\python.exe',
+#        r'C:\Python36-x64\python.exe',
+        ]
+elif sys.platform == 'darwin':
+    pythons = [
+        'python2.7',
+        'python3.4',
+        'python3.5',
+        'python3.6',
+        ]
+elif site.__file__.startswith('/opt/python/cp'):
+    pythons = [
+        'python2.7',
+        'python3.4',
+        'python3.5',
+        'python3.6',
+        ]
+else:
+    pythons = [
+        'python2.7',
+        'python3.5'
+    ]
+
+class FXraysRelease(Command):
+    # The -rX option modifies the wheel name by adding rcX to the version string.
+    # This is for uploading to testpypi, which will not allow uploading two
+    # wheels with the same name.
+    user_options = [('rctag=', 'r', 'index for rc tag to be appended to version (e.g. -r2 -> rc2)')]
+    def initialize_options(self):
+        self.rctag = None
+    def finalize_options(self):
+        if self.rctag:
+            self.rctag = 'rc%s'%self.rctag
+    def run(self):
+        if os.path.exists('build'):
+            shutil.rmtree('build')
+        if os.path.exists('dist'):
+            shutil.rmtree('dist')
+        for python in pythons:
+            try:
+                subprocess.check_call([python, 'setup.py', 'build'])
+            except subprocess.CalledProcessError:
+                raise RuntimeError('Build failed for %s.'%python)
+                sys.exit(1)
+            try:
+                subprocess.check_call([python, 'setup.py', 'test'])
+            except subprocess.CalledProcessError:
+                raise RuntimeError('Test failed for %s.'%python)
+                sys.exit(1)
+            try:
+                subprocess.check_call([python, 'setup.py', 'bdist_wheel'])
+            except subprocess.CalledProcessError:
+                raise RuntimeError('Error building wheel for %s.'%python)
+        if sys.platform.startswith('linux'):
+            # auditwheel generates names with more tags than allowed by pypi
+            extra_tag = re.compile('linux_x86_64\.|linux_i686\.')
+            # build wheels tagged as manylinux1
+            for wheelname in [name for name in os.listdir('dist') if name.endswith('.whl')]:
+                original_path = os.path.join('dist', wheelname)
+                subprocess.check_call(['auditwheel', 'addtag', '-w', 'dist', original_path])
+                os.remove(original_path)
+        else:
+            extra_tag = None
+        version = re.compile('-([^-]*)-')
+        for wheel_name in [name for name in os.listdir('dist') if name.endswith('.whl')]:
+            new_name = wheel_name
+            if extra_tag:
+                new_name = extra_tag.sub('', new_name, 1)
+            if self.rctag:
+                new_name = version.sub('-\g<1>%s-'%self.rctag, new_name, 1)
+            os.rename(os.path.join('dist', wheel_name), os.path.join('dist', new_name))
+        try:
+            subprocess.check_call(['python', 'setup.py', 'sdist'])
+        except subprocess.CalledProcessError:
+            raise RuntimeError('Error building sdist archive for %s.'%python)
+        sdist_version = re.compile('-([^-]*)(.tar.gz)|-([^-]*)(.zip)')
+        for archive_name in [name for name in os.listdir('dist')
+                             if name.endswith('tar.gz') or name.endswith('.zip')]:
+            if self.rctag:
+                new_name = sdist_version.sub('-\g<1>%s\g<2>'%self.rctag, archive_name, 1)
+                os.rename(os.path.join('dist', archive_name), os.path.join('dist', new_name))
+
+# If have Cython, check that .c files are up to date:
+
+try:
+    from Cython.Build import cythonize
+    if 'clean' not in sys.argv:
+        file = 'cython_src/FXraysmodule.pyx'
+        if os.path.exists(file):
+            cythonize([file])
+except ImportError:
+    pass 
+
 
 setup(
     name = 'FXrays',
@@ -61,6 +196,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
         'Operating System :: OS Independent',
         'Programming Language :: C',
+        'Programming Language :: Cython',
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering :: Mathematics',
         ],
@@ -68,7 +204,9 @@ setup(
     packages = ['FXrays'],
     package_dir = {'FXrays':'python_src'}, 
     ext_modules = [FXrays],
-    cmdclass = {'clean':clean},
+    cmdclass = {'clean':FXraysClean,
+                'test':FXraysTest,
+                'release':FXraysRelease},
     zip_safe=False, 
 )
 
