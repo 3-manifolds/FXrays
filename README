@@ -73,6 +73,10 @@ https://docs.python.org/2.7/library/site.html) do
 
   python setup.py build --user
 
+NOTE: On Windows, FXrays does not build correctly with mingw64.  There
+are segfaults caused by linking with msvcrt instead of msvcr90.
+However, building a 64 bit FXrays with the default msvc compiler (in
+the Microsoft Visual C++ for Python 2.7 package) works.
 
 Bugs and Comments
 -------------------------

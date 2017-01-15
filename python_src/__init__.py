@@ -6,9 +6,9 @@ therefore does not implement various features that might be useful for
 general extremal ray problems.
 """
 
-from .FXrays import find_Xrays
+from .FXraysmodule import find_Xrays
 
-__version__ = '1.2'
+__version__ = '1.3.3b1'
 
 def version():
     return __version__
