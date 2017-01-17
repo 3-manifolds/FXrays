@@ -1,9 +1,9 @@
-import FXrays
+from .FXraysmodule import find_Xrays
 
 def test0():
     """
     >>> test0()     # doctest: +NORMALIZE_WHITESPACE
-    [(0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0),
+    [(1000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0),
      (0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0),
      (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0),
      (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0),
@@ -31,7 +31,7 @@ def test0():
         0,0,0,0,0,0,0,-1,1,-1,1,0,0,0,0,1,0,-1,0,-1,1,1,0,-1,0,0,0,
         0,0,0,0,0,0,-1,1,0,1,0,-1,0,-1,1,-1,1,0,0,0,0,-1,1,0,0,0,0]
 
-    return sorted(FXrays.find_Xrays(rows, columns, matrix, print_progress=False))
+    return sorted(find_Xrays(rows, columns, matrix, print_progress=False))
     
 def test1():
     """
@@ -68,7 +68,7 @@ def test1():
         0,0,0,0,0,0,0,-1,1,0,0,0,-1,1,0,0,0,0,1,0,-1,-1,1,0,0,-1,1,0,0,0,
         0,0,0,0,0,0,0,0,0,-1,1,0,1,0,-1,0,-1,1,1,0,-1,0,-1,1,0,0,0,0,0,0]
 
-    return sorted(FXrays.find_Xrays(rows, columns, matrix, print_progress=False))
+    return sorted(find_Xrays(rows, columns, matrix, print_progress=False))
 
 def test2():
     """
@@ -125,7 +125,7 @@ def test2():
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,-1,1,-1,1,0,-1,1,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,1,0,0,-2,2]
         
-    return sorted(FXrays.find_Xrays(rows, columns, matrix, print_progress=False))
+    return sorted(find_Xrays(rows, columns, matrix, print_progress=False))
 
 def magic5():
     """
@@ -147,16 +147,16 @@ def magic5():
         0, 1, 1, 1, 1, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 
         1, 1, 1, 1, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0]
 
-    return len(FXrays.find_Xrays(rows, columns, matrix, filtering=False,
+    return len(find_Xrays(rows, columns, matrix, filtering=False,
                                  modp=True, print_progress=False))
 
 
 def t12345_matrix():
     """
     >>> rows, cols, matrix = t12345_matrix()
-    >>> len(FXrays.find_Xrays(rows, cols, matrix, filtering=False, print_progress=False))
+    >>> len(find_Xrays(rows, cols, matrix, filtering=False, print_progress=False))
     1525
-    >>> sorted(FXrays.find_Xrays(rows, cols, matrix, filtering=True, print_progress=False))  # doctest: +NORMALIZE_WHITESPACE
+    >>> sorted(find_Xrays(rows, cols, matrix, filtering=True, print_progress=False))  # doctest: +NORMALIZE_WHITESPACE
     [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2, 0), 
      (0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 4, 0, 0, 1, 0, 0, 0, 2, 0), 
      (0, 0, 0, 0, 0, 0, 0, 2, 0, 4, 0, 0, 0, 0, 4, 0, 4, 0, 0, 6, 0, 3, 0, 0),
@@ -211,10 +211,3 @@ def t12345_matrix():
                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 1, -1, 0, 1, -1, -2, 0, 2]
 
     return rows, columns, matrix
-
-def runtests():
-    import doctest
-    doctest.testmod()
-
-if __name__ == '__main__':
-    runtests()
