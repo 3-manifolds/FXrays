@@ -85,14 +85,14 @@ if sys.platform == 'win32':
     pythons = [
         r'C:\Python27\python.exe',
         r'C:\Python27-x64\python.exe',
-# Appveyor has these:
-#        r'C:\Python34\python.exe',
-#        r'C:\Python34-x64\python.exe',
-#        r'C:\Python35\python.exe',
-#        r'C:\Python35-x64\python.exe',
-#        r'C:\Python36\python.exe',
-#        r'C:\Python36-x64\python.exe',
+        r'C:\Python34\python.exe',
+        r'C:\Python34-x64\python.exe',
+        r'C:\Python35\python.exe',
+        r'C:\Python35-x64\python.exe',
+        r'C:\Python36\python.exe',
+        r'C:\Python36-x64\python.exe',
         ]
+    pythons = [py for py in pythons if os.path.exists(py)]
 elif sys.platform == 'darwin':
     pythons = [
         'python2.7',
