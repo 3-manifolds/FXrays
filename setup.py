@@ -76,7 +76,10 @@ class FXraysTest(Command):
         )
         sys.path.insert(0, build_lib_dir)
         from FXrays.test import runtests
-        sys.exit(runtests())
+        results = runtests()
+        print(results)
+        status = 0 if results.failed == 0 else 1
+        sys.exit(status)
 
 if sys.platform == 'win32':
     pythons = [
