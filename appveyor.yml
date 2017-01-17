@@ -21,12 +21,12 @@ install:
   # These Python packages are needed to build FXrays
   - "%PYTHON%\\python.exe -m pip install --upgrade pip setuptools"
   - "%PYTHON%\\python.exe -m pip install Cython wheel"
-  - "%PYTHON%\\python.exe setup.py install"
+  - "%PYTHON%\\python.exe setup.py build"
   
 build: none
   
 test_script:
-  - "%PYTHON%\\python.exe -m FXrays.test"
+  - "%PYTHON%\\python.exe -m setup.py test"
 
 after_test:
   # This step builds your wheels.
