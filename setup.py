@@ -103,12 +103,10 @@ class FXraysRelease(Command):
                 subprocess.check_call([python, 'setup.py', 'build'])
             except subprocess.CalledProcessError:
                 raise RuntimeError('Build failed for %s.'%python)
-                sys.exit(1)
             try:
                 subprocess.check_call([python, 'setup.py', 'test'])
             except subprocess.CalledProcessError:
                 raise RuntimeError('Test failed for %s.'%python)
-                sys.exit(1)
             try:
                 subprocess.check_call([python, 'setup.py', 'bdist_wheel'])
             except subprocess.CalledProcessError:
