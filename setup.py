@@ -112,21 +112,22 @@ class FXraysRelease(Command):
             except subprocess.CalledProcessError:
                 raise RuntimeError('Error building wheel for %s.'%python)
             
-        if sys.platform.startswith('linux'):
-            try:
-                subprocess.check_call([python, 'setup.py', 'bdist_egg'])
-            except subprocess.CalledProcessError:
-                raise RuntimeError('Error building wheel for %s.'%python)
+            if sys.platform.startswith('linux'):
+                try:
+                    subprocess.check_call([python, 'setup.py', 'bdist_egg'])
+                except subprocess.CalledProcessError:
+                    raise RuntimeError('Error building egg for %s.'%python)
             
-            # auditwheel generates names with more tags than allowed by pypi
-            extra_tag = re.compile('linux_x86_64\.|linux_i686\.')
-            # build wheels tagged as manylinux1
-            for wheelname in [name for name in os.listdir('dist') if name.endswith('.whl')]:
-                original_path = os.path.join('dist', wheelname)
-                subprocess.check_call(['auditwheel', 'addtag', '-w', 'dist', original_path])
-                os.remove(original_path)
+                # auditwheel generates names with more tags than allowed by pypi
+                extra_tag = re.compile('linux_x86_64\.|linux_i686\.')
+                # build wheels tagged as manylinux1
+                for wheelname in [name for name in os.listdir('dist') if name.endswith('.whl')]:
+                    original_path = os.path.join('dist', wheelname)
+                    subprocess.check_call(['auditwheel', 'addtag', '-w', 'dist', original_path])
+                    os.remove(original_path)
         else:
             extra_tag = None
+            
         version_tag = re.compile('-([^-]*)-')
         for wheel_name in [name for name in os.listdir('dist') if name.endswith('.whl')]:
             new_name = wheel_name
