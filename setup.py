@@ -23,6 +23,7 @@ Fukuda's.
 import os, re, sys, sysconfig, shutil, subprocess, site
 from setuptools import setup, Command, Extension
 from distutils.util import get_platform
+from glob import glob
 
 
 # Get version number from module
@@ -61,7 +62,11 @@ class FXraysClean(Command):
     def finalize_options(self):
         pass
     def run(self):
-        os.system('rm -rf build dist *.pyc cython_src/*.c FXrays.egg-info')
+        for dir in ['build', 'dist', 'FXrays.egg-info']:
+            shutil.rmtree(dir, ignore_errors=True)
+        for file in glob('*.pyc') + glob('cython_src/*.c'):
+            if os.path.exists(file):
+                os.remove(file)
 
 class FXraysTest(Command):
     user_options = []
