@@ -95,9 +95,11 @@ class FXraysRelease(Command):
     # The -rX option modifies the wheel name by adding rcX to the version string.
     # This is for uploading to testpypi, which will not allow uploading two
     # wheels with the same name.
-    user_options = [('rctag=', 'r', 'index for rc tag to be appended to version (e.g. -r2 -> rc2)')]
+    user_options = [('rctag=', 'r', 'index for rc tag to be appended to version (e.g. -r2 -> rc2)'), 
+                    ('install', 'i', 'install the release into each Python')]
     def initialize_options(self):
         self.rctag = None
+        self.install = False
     def finalize_options(self):
         if self.rctag:
             self.rctag = 'rc%s'%self.rctag
@@ -118,6 +120,9 @@ class FXraysRelease(Command):
                 check_call([python, 'setup.py', 'bdist_egg'])
             else:
                 check_call([python, 'setup.py', 'bdist_wheel'])
+
+            if self.install:
+                check_call([python, 'setup.py', 'install'])
 
         # Build sdist using the *first* specified Python
         check_call([pythons[0], 'setup.py', 'sdist'])
