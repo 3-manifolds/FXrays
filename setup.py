@@ -81,38 +81,6 @@ class FXraysTest(Command):
         status = 0 if results.failed == 0 else 1
         sys.exit(status)
 
-if sys.platform == 'win32':
-    pythons = [
-        r'C:\Python27\python.exe',
-        r'C:\Python27-x64\python.exe',
-        r'C:\Python34\python.exe',
-        r'C:\Python34-x64\python.exe',
-        r'C:\Python35\python.exe',
-        r'C:\Python35-x64\python.exe',
-        r'C:\Python36\python.exe',
-        r'C:\Python36-x64\python.exe',
-        ]
-    pythons = [py for py in pythons if os.path.exists(py)]
-elif sys.platform == 'darwin':
-    pythons = [
-        'python2.7',
-        'python3.4',
-        'python3.5',
-        'python3.6',
-        ]
-elif site.__file__.startswith('/opt/python/cp'):
-    pythons = [
-        'python2.7',
-        'python3.4',
-        'python3.5',
-        'python3.6',
-        ]
-else:
-    pythons = [
-        'python2.7',
-        'python3.5'
-    ]
-
 class FXraysRelease(Command):
     # The -rX option modifies the wheel name by adding rcX to the version string.
     # This is for uploading to testpypi, which will not allow uploading two
@@ -128,6 +96,8 @@ class FXraysRelease(Command):
             shutil.rmtree('build')
         if os.path.exists('dist'):
             shutil.rmtree('dist')
+
+        pythons = os.environ.get('PYTHONRELEASELIST', sys.executable).split(',')
         for python in pythons:
             try:
                 subprocess.check_call([python, 'setup.py', 'build'])
