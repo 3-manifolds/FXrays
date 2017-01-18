@@ -116,7 +116,7 @@ class FXraysRelease(Command):
             if sys.platform.startswith('linux'):
                 plat = get_platform().replace('linux', 'manylinux1')
                 plat = plat.replace('-', '_')
-                check_call([python, 'setup.py', 'bdist_wheel', '--plat-name=' + plat])
+                check_call([python, 'setup.py', 'bdist_wheel', '-p', plat])
                 check_call([python, 'setup.py', 'bdist_egg'])
             else:
                 check_call([python, 'setup.py', 'bdist_wheel'])
