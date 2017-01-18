@@ -111,7 +111,13 @@ class FXraysRelease(Command):
                 subprocess.check_call([python, 'setup.py', 'bdist_wheel'])
             except subprocess.CalledProcessError:
                 raise RuntimeError('Error building wheel for %s.'%python)
+            
         if sys.platform.startswith('linux'):
+            try:
+                subprocess.check_call([python, 'setup.py', 'bdist_egg'])
+            except subprocess.CalledProcessError:
+                raise RuntimeError('Error building wheel for %s.'%python)
+            
             # auditwheel generates names with more tags than allowed by pypi
             extra_tag = re.compile('linux_x86_64\.|linux_i686\.')
             # build wheels tagged as manylinux1
@@ -129,10 +135,12 @@ class FXraysRelease(Command):
             if self.rctag:
                 new_name = version_tag.sub('-\g<1>%s-'%self.rctag, new_name, 1)
             os.rename(os.path.join('dist', wheel_name), os.path.join('dist', new_name))
+
         try:
             subprocess.check_call([python, 'setup.py', 'sdist'])
         except subprocess.CalledProcessError:
             raise RuntimeError('Error building sdist archive for %s.'%python)
+
         sdist_version = re.compile('-([^-]*)(.tar.gz)|-([^-]*)(.zip)')
         for archive_name in [name for name in os.listdir('dist')
                              if name.endswith('tar.gz') or name.endswith('.zip')]:
