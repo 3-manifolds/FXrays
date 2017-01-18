@@ -133,7 +133,7 @@ class FXraysRelease(Command):
         if sys.platform.startswith('linux'):
             for name in os.listdir('dist'):
                 if name.endswith('.whl'):
-                    subprocess.check_call(['auditwheel', 'addtag', os.path.join('dist', name)])
+                    subprocess.check_call(['auditwheel', 'repair', os.path.join('dist', name)])
 
 # If have Cython, check that .c files are up to date:
 
