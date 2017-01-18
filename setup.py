@@ -130,7 +130,7 @@ class FXraysRelease(Command):
                 new_name = version_tag.sub('-\g<1>%s-'%self.rctag, new_name, 1)
             os.rename(os.path.join('dist', wheel_name), os.path.join('dist', new_name))
         try:
-            subprocess.check_call(['python', 'setup.py', 'sdist'])
+            subprocess.check_call([python, 'setup.py', 'sdist'])
         except subprocess.CalledProcessError:
             raise RuntimeError('Error building sdist archive for %s.'%python)
         sdist_version = re.compile('-([^-]*)(.tar.gz)|-([^-]*)(.zip)')
