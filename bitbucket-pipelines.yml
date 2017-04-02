@@ -9,5 +9,6 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
+          - apt install patchelf
           - python -m pip install cython wheel auditwheel
           - python setup.py release --install
