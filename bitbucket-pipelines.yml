@@ -9,6 +9,10 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
+          # SageMath
+          - sage -python setup.py build
+          - sage -python setup.py test
+          # Plain Python:
           # - python -m pip install cython
-          - python setup.py build
-          - python setup.py test
+          # - python setup.py build
+          # - python setup.py test
