@@ -9,5 +9,5 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - python -m pip install cython
+          - python -m pip install cython wheel
           - python setup.py release --install
