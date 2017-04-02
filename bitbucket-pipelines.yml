@@ -9,6 +9,6 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - python -m pip install -U pip setuptools
-          - python -m pip install cython auditwheel
-          - python setup.py release --install
+          - python -m pip install cython
+          - python setup.py build
+          - python setup.py test
