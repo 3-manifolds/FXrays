@@ -95,6 +95,21 @@ def check_call(args):
         executable = args[0]
         command = [a for a in args if not a.startswith('-')][-1]
         raise RuntimeError(command + ' failed for ' + executable)
+
+# For manylinux1 wheels, need to set the platform name manually
+try:
+    from wheel.bdist_wheel import bdist_wheel
+    class FXraysBuildWheel(bdist_wheel):
+        def initialize_options(self):
+            bdist_wheel.initialize_options(self)
+            if sys.platform.startswith('linux'):
+                plat = get_platform().replace('linux', 'manylinux1')
+                plat = plat.replace('-', '_')
+                self.plat_name = plat
+        
+except ImportError:
+    FXraysBuildWheel = None
+    
         
 class FXraysRelease(Command):
     user_options = [('install', 'i', 'install the release into each Python')]
@@ -113,15 +128,11 @@ class FXraysRelease(Command):
             check_call([python, 'setup.py', 'build'])
             check_call([python, 'setup.py', 'test'])
             if sys.platform.startswith('linux'):
-                plat = get_platform().replace('linux', 'manylinux1')
-                plat = plat.replace('-', '_')
-                check_call([python, 'setup.py', 'bdist_wheel', '-p', plat])
                 check_call([python, 'setup.py', 'bdist_egg'])
+            if self.install:
+                check_call([python, 'setup.py', 'pip_install'])
             else:
                 check_call([python, 'setup.py', 'bdist_wheel'])
-
-            if self.install:
-                check_call([python, 'setup.py', 'install'])
 
         # Build sdist using the *first* specified Python
         check_call([pythons[0], 'setup.py', 'sdist'])
@@ -131,6 +142,24 @@ class FXraysRelease(Command):
             for name in os.listdir('dist'):
                 if name.endswith('.whl'):
                     subprocess.check_call(['auditwheel', 'repair', os.path.join('dist', name)])
+
+class FXraysPipInstall(Command):
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        python = sys.executable
+        check_call([python, 'setup.py', 'bdist_wheel'])
+        egginfo = 'FXrays.egg-info'
+        if os.path.exists(egginfo):
+            shutil.rmtree(egginfo)
+        check_call([python, '-m', 'pip', 'install', '--upgrade',
+                    '--no-index', '--no-cache-dir', '--find-links=dist',
+                    'FXrays'])
+        
+                   
 
 # If have Cython, check that .c files are up to date:
 
@@ -169,7 +198,10 @@ setup(
     ext_modules = [FXrays],
     cmdclass = {'clean':FXraysClean,
                 'test':FXraysTest,
-                'release':FXraysRelease},
+                'release':FXraysRelease,
+                'bdist_wheel':FXraysBuildWheel,
+                'pip_install':FXraysPipInstall,
+    },
     zip_safe=False, 
 )
 
