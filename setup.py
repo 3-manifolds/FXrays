@@ -155,9 +155,11 @@ class FXraysPipInstall(Command):
         egginfo = 'FXrays.egg-info'
         if os.path.exists(egginfo):
             shutil.rmtree(egginfo)
+        wheels = glob('dist' + os.sep + '*.whl')
+        new_wheel = max(wheels, key=os.path.getmtime)            
         check_call([python, '-m', 'pip', 'install', '--upgrade',
-                    '--no-index', '--no-cache-dir', '--find-links=dist',
-                    'FXrays'])
+                    '--upgrade-strategy', 'only-if-needed',
+                    new_wheel])
         
                    
 
