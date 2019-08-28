@@ -182,7 +182,7 @@ setup(
     long_description = long_description,
     url = 'http://t3m.computop.org',
     author = 'Marc Culler and Nathan M. Dunfield',
-    author_email = 'culler@uic.edu, nathan@dunfield.info',
+    author_email = 'culler@marc-culler.info, nathan@dunfield.info',
     license='GPLv2+',
     classifiers = [
         'Development Status :: 5 - Production/Stable',

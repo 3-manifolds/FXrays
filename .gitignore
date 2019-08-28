@@ -3,6 +3,4 @@ build/
 dist/
 cython_src/FXraysmodule.c
 .DS_Store
-
-syntax: glob
 *.pyc
