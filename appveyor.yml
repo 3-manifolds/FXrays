@@ -5,37 +5,37 @@ environment:
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
 
-    - PYTHON: "C:\\Python27"
-    - PYTHON: "C:\\Python27-x64"
-    - PYTHON: "C:\\Python34"
-    - PYTHON: "C:\\Python34-x64"
-    - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python35-x64"
-    - PYTHON: "C:\\Python36"
-    - PYTHON: "C:\\Python36-x64"
-    - PYTHON: "C:\\Python37"
-    - PYTHON: "C:\\Python37-x64"
+    - PYTHON: "C:\\Python27\\python.exe"
+    - PYTHON: "C:\\Python27-x64\\python.exe"
+    - PYTHON: "C:\\Python35\\python.exe"
+    - PYTHON: "C:\\Python35-x64\\python.exe"
+    - PYTHON: "C:\\Python36\\python.exe"
+    - PYTHON: "C:\\Python36-x64\\python.exe"
+    - PYTHON: "C:\\Python37\\python.exe"
+    - PYTHON: "C:\\Python37-x64\\python.exe"
+    - PYTHON: "C:\\Python38\\python.exe"
+    - PYTHON: "C:\\Python38-x64\\python.exe"
 
 install:
   # Note that you must use the environment variable %PYTHON% to refer to
   # the interpreter you're using - Appveyor does not do anything special
-  # to put the Python evrsion you want to use on PATH.
+  # to put the Python version you want to use on PATH.
   # These Python packages are needed to build FXrays
-  - "%PYTHON%\\python.exe -m pip install --upgrade pip setuptools"
-  - "%PYTHON%\\python.exe -m pip install Cython wheel"
-  - "%PYTHON%\\python.exe setup.py build"
+  - "%PYTHON% -m pip install --upgrade pip setuptools"
+  - "%PYTHON% -m pip install Cython wheel"
+  - "%PYTHON% setup.py build"
   
 build: none
   
 test_script:
-  - "%PYTHON%\\python.exe -m setup.py test"
+  - "%PYTHON% -m setup.py test"
 
 after_test:
   # This step builds your wheels.
   # Again, you only need build.cmd if you're building C extensions for
   # 64-bit Python 3.3/3.4. And you need to use %PYTHON% to get the correct
   # interpreter
-  - "%PYTHON%\\python.exe setup.py bdist_wheel"
+  - "%PYTHON% setup.py bdist_wheel"
 
 artifacts:
   # bdist_wheel puts your built wheel in the dist directory
