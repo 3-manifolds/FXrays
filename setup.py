@@ -81,7 +81,7 @@ class FXraysTest(Command):
                 platform=sysconfig.get_platform(),
                 version_info=sys.version_info)
         )
-        sys.path.insert(0, build_lib_dir)
+        sys.path.insert(0, os.path.abspath(build_lib_dir))
         from FXrays.test import runtests
         results = runtests()
         print(results)
