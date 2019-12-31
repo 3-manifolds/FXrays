@@ -1,3 +1,5 @@
+#cython: language_level=3
+
 cdef extern from "FXrays.h":
     cdef struct support_s:
         unsigned int supp[4]
@@ -87,7 +89,7 @@ def find_Xrays(int rows, int columns, matrix, modp=False,
         raise ValueError('rows*columns != length of matrix list.')
 
     if filtering:
-        filter = FXrays_embedded_filter(columns/3)
+        filter = FXrays_embedded_filter(columns//3)
 
     for i, c in enumerate(matrix):
         c_matrix.matrix[i] = c
