@@ -10,5 +10,5 @@ install:
   - docker pull $DOCKER_IMAGE
 
 script:
-  - docker run --rm -e PLAT=$PLAT -v `pwd`:/fxrays $DOCKER_IMAGE bash /fxrays/dev/build-wheels.sh
+  - docker run --rm -e PLAT=$PLAT -v `pwd`:/io $DOCKER_IMAGE bash /io/dev/build-wheels.sh
   - ls wheelhouse/
