@@ -3,7 +3,7 @@ set -e -x
 
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
-    "${PYBIN}/pip" install -r /fxrays/dev/requirements.txt
+    "${PYBIN}/pip" install -r /fxrays/dev/dev-requirements.txt
     "${PYBIN}/pip" wheel /fxrays/ -w wheelhouse/
 done
 
