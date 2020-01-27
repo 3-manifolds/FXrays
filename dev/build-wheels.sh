@@ -4,7 +4,7 @@ set -e -x
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
     "${PYBIN}/pip" install -r /fxrays/dev/requirements.txt
-    "${PYBIN}/pip" wheel /io/ -w wheelhouse/
+    "${PYBIN}/pip" wheel /fxrays/ -w wheelhouse/
 done
 
 # Bundle external shared libraries into the wheels
