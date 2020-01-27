@@ -15,5 +15,5 @@ done
 # Install packages and test
 for PYBIN in /opt/python/*/bin/; do
     "${PYBIN}/pip" install FXrays --no-index -f /fxrays/wheelhouse
-    #(cd "$HOME"; "${PYBIN}/nosetests" pymanylinuxdemo)
+    "${PYBIN}/python" -m FXrays.test -v 
 done
