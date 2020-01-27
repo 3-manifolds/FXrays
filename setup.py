@@ -95,21 +95,6 @@ def check_call(args):
         executable = args[0]
         command = [a for a in args if not a.startswith('-')][-1]
         raise RuntimeError(command + ' failed for ' + executable)
-
-# For manylinux1 wheels, need to set the platform name manually
-try:
-    from wheel.bdist_wheel import bdist_wheel
-    class FXraysBuildWheel(bdist_wheel):
-        def initialize_options(self):
-            bdist_wheel.initialize_options(self)
-            if sys.platform.startswith('linux'):
-                plat = get_platform().replace('linux', 'manylinux1')
-                plat = plat.replace('-', '_')
-                self.plat_name = plat
-        
-except ImportError:
-    FXraysBuildWheel = None
-    
         
 class FXraysRelease(Command):
     user_options = [('install', 'i', 'install the release into each Python')]
@@ -127,8 +112,6 @@ class FXraysRelease(Command):
         for python in pythons:
             check_call([python, 'setup.py', 'build'])
             check_call([python, 'setup.py', 'test'])
-            if sys.platform.startswith('linux'):
-                check_call([python, 'setup.py', 'bdist_egg'])
             if self.install:
                 check_call([python, 'setup.py', 'pip_install'])
             else:
@@ -201,7 +184,6 @@ setup(
     cmdclass = {'clean':FXraysClean,
                 'test':FXraysTest,
                 'release':FXraysRelease,
-                'bdist_wheel':FXraysBuildWheel,
                 'pip_install':FXraysPipInstall,
     },
     zip_safe=False, 
