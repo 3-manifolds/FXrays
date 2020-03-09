@@ -1,7 +1,8 @@
 environment:
-
+  image:
+    - Visual Studio 2015
+ 
   matrix:
-
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
 
