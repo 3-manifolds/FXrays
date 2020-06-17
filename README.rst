@@ -1,5 +1,9 @@
+FXrays
+======
+
+
 Description
-===========
+-----------
 
 This package is a small, fast implementation of an algorithm for
 finding extremal rays of a polyhedral cone, with filtering.  It is
@@ -27,8 +31,8 @@ Fukuda's.  One constructs a sequence P_n of polyhedra as follows.
 
 P_0 is the standard n-simplex.
 
-Given P_n-1, construct P_n as follows. Take the hyperplane H_n defined
-by the nth row of the matrix M. Divide the vertices of P_n-1 into
+Given P_{n-1}, construct P_n as follows. Take the hyperplane H_n defined
+by the nth row of the matrix M. Divide the vertices of P_{n-1} into
 three classes: positive, negative and neutral, according to whether
 they lie on the positive side, the negative side, or are contained in,
 H_n. For each pair consisting of a positive vertex v and a negative
@@ -36,58 +40,56 @@ vertex w we intersect H with the segment joining v to w. The
 intersection point u will give rise to a vertex of P_n if it satisfies
 two conditions:
 
-   1. the support of u is legal; and
+1.  the support of u is legal; and
 
-   2. the submatrix of M_u of M has nullity 1, where M_u consists of
-      elements of which are contained in the first n rows and in the
-      columns which are indexed by the support of u.
+2.  the submatrix of M_u of M has nullity 1, where M_u consists of
+    elements of which are contained in the first n rows and in the
+    columns which are indexed by the support of u.
 
 If u satisfies these conditions then its smallest integral multiple is a
-vertex of P_n.  The neutral vertices of P_n-1 are also vertices of P_n.
+vertex of P_n.  The neutral vertices of P_{n-1} are also vertices of P_n.
 
 If M has k rows, then the vertices of P_k generate the set of extremal
 rays of the cone which have legal supports.
 
 Installation Instructions
-=========================
+-------------------------
 
 This package can be built either as a standalone C module, which you
-can link with your own C code, or as a python module.  The python
+can link with your own C code, or as a Python module.  The Python
 module is needed by t3m.
 
 To build the C module type make in the distribution directory. The
-code will run much faster. The object file FXrays.o and a number of
+code will run much faster. The object file ``FXrays.o`` and a number of
 test programs will be built.
 
-To build the python module, if you have superuser privileges on your
-UNIX system, type:
+To build the Python module, if you have superuser privileges on your
+UNIX system, type::
 
-  python setup.py install
+    python setup.py install
 
-This will install FXrays in the site-packages directory of your
-python installation.
+This will install FXrays in the ``site-packages`` directory of your
+Python installation.
 
-If you are not a superuser and wish to install the FXrays python
-module into your user site-packages
+If you are not a superuser and wish to install the FXrays Python
+module into your user ``site-packages``, type::
 
-  python setup.py build --user
+    python setup.py build --user
 
 NOTE: On Windows, FXrays does not build correctly with mingw64.  There
 are segfaults caused by linking with msvcrt instead of msvcr90.
-However, building a 64 bit FXrays with the default msvc compiler (in
+However, building a 64-bit FXrays with the default msvc compiler (in
 the Microsoft Visual C++ for Python 2.7 package) works.
 
 Bugs and Comments
--------------------------
+-----------------
 
 To report bugs or provide comments please visit the
-`FXrays issue page. <https://github.com/3-manifolds/FXrays/issues>`_
-
-
+`FXrays issue page <https://github.com/3-manifolds/FXrays/issues>`_.
 
 
 License
--------------------------
+-------
 
 Copyright (C) 2000-present by Marc Culler and others.
 
@@ -95,6 +97,6 @@ This program is released under the GNU General Public License version
 2 or (at your option) any later version as published by the Free
 Software Foundation. See
 
-     http://www.gnu.org/licenses/gpl-2.0.txt 
+     https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
 for the complete license text. 
