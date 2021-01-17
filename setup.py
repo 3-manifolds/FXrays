@@ -140,8 +140,8 @@ class FXraysPipInstall(Command):
             shutil.rmtree(egginfo)
         wheels = glob('dist' + os.sep + '*.whl')
         new_wheel = max(wheels, key=os.path.getmtime)            
-        check_call([python, '-m', 'pip', 'install', '--upgrade',
-                    '--upgrade-strategy', 'only-if-needed',
+        check_call([python, '-m', 'pip', 'install',
+                    '--upgrade', '--force-reinstall',
                     new_wheel])
         
                    
