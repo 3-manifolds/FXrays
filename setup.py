@@ -161,6 +161,7 @@ except ImportError:
 setup(
     name = 'FXrays',
     version = version,
+    python_requires = '>=3',
     description = 'Computes extremal rays with filtering',
     long_description = long_description,
     url = 'http://t3m.computop.org',
