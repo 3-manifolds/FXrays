@@ -52,6 +52,7 @@ vertex of P_n.  The neutral vertices of P_{n-1} are also vertices of P_n.
 If M has k rows, then the vertices of P_k generate the set of extremal
 rays of the cone which have legal supports.
 
+
 Installation Instructions
 -------------------------
 
@@ -80,6 +81,7 @@ NOTE: On Windows, FXrays does not build correctly with mingw64.  There
 are segfaults caused by linking with msvcrt instead of msvcr90.
 However, building a 64-bit FXrays with the default msvc compiler (in
 the Microsoft Visual C++ for Python 2.7 package) works.
+
 
 Bugs and Comments
 -----------------
