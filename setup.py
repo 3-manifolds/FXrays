@@ -164,7 +164,7 @@ setup(
     python_requires = '>=3',
     description = 'Computes extremal rays with filtering',
     long_description = long_description,
-    url = 'http://t3m.computop.org',
+    url = 'https://github.com/3-manifolds/FXrays',
     author = 'Marc Culler and Nathan M. Dunfield',
     author_email = 'culler@marc-culler.info, nathan@dunfield.info',
     license='GPLv2+',
