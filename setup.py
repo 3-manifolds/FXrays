@@ -25,10 +25,6 @@ from setuptools import setup, Command, Extension
 from distutils.util import get_platform
 from glob import glob
 
-# Disable M1 builds until we can test.
-if sys.platform == 'darwin':
-    os.environ['_PYTHON_HOST_PLATFORM'] = 'macosx-10.9-x86_64'
-    os.environ['ARCHFLAGS'] = '-arch x86_64'
 
 # Get version number from module
 version = re.search("__version__ = '(.*)'",
