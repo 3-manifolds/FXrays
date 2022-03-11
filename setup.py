@@ -20,11 +20,9 @@ The algorithm is due to Dave Letscher, and incorporates ideas of Komei
 Fukuda's.
 """
 
-import os, re, sys, sysconfig, shutil, subprocess, site
+import os, re, sys, sysconfig, shutil, subprocess, site, platform
 from setuptools import setup, Command, Extension
-from distutils.util import get_platform
 from glob import glob
-
 
 # Get version number from module
 version = re.search("__version__ = '(.*)'",
