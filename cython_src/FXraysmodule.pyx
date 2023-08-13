@@ -31,10 +31,10 @@ cdef extern from "FXrays.h":
     void FXrays_destroy_filter_list(filter_list_t *filterlist)
     
     void* FXrays_find_vertices(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
-                    void *(*output_func)(vertex_stack_t *stack, int dimension))
+                    void *(*output_func)(vertex_stack_t *stack, int dimension) except *)
     
     void *FXrays_find_vertices_mod_p(matrix_t *matrix, filter_list_t *filter_list, int print_progress, 
-                          void *(*output_func)(vertex_stack_t *stack, int dimension))
+                          void *(*output_func)(vertex_stack_t *stack, int dimension) except *)
 
 
 cdef extern from "Python.h":
