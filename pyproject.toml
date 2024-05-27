@@ -37,3 +37,6 @@ test-command = "python -m FXrays.test"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "auditwheel repair --strip -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+archs = "x86_64 arm64 universal2"
