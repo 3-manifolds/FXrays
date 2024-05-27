@@ -8,7 +8,7 @@ name = "FXrays"
 dynamic = ["version"]
 description = "Computes extremal rays with filtering"
 readme = "README.rst"
-requires-python = ">=3.7 "
+requires-python = ">=3.7"
 authors = [
   {name = "Marc Culler", email = "culler@marc-culler.info"},
   {name = "Nathan M. Dunfield", email = "nathan@dunfield.info"},
@@ -30,3 +30,13 @@ Homepage = "https://github.com/3-manifolds/FXrays"
 
 [tool.setuptools.dynamic]
 version = {attr = "FXrays.__version__"}
+
+[tool.cibuildwheel]
+skip = "*-manylinux_i686 *musllinux* pp*"
+test-command = "python -m FXrays.test"
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = "auditwheel repair --strip -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+archs = "x86_64 arm64 universal2"
