@@ -35,7 +35,7 @@ version = {attr = "FXrays.__version__"}
 build = "cp38* cp39* cp310* cp311* cp312* cp313*"
 skip = "*musllinux*"
 archs = "auto64"
-test-command = "python -m knot_floer_homology.test"
+test-command = "python -m FXrays.test"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "auditwheel repair --strip -w {dest_dir} {wheel}"
