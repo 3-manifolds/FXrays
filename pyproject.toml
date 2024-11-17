@@ -32,9 +32,10 @@ Homepage = "https://github.com/3-manifolds/FXrays"
 version = {attr = "FXrays.__version__"}
 
 [tool.cibuildwheel]
-skip = "*-manylinux_i686 *musllinux* pp*"
-test-command = "python -m FXrays.test"
+build = "cp38* cp39* cp310* cp311* cp312* cp313*"
+skip = "*musllinux*"
+archs = "auto64"
+test-command = "python -m knot_floer_homology.test"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "auditwheel repair --strip -w {dest_dir} {wheel}"
-
