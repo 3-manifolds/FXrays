@@ -34,7 +34,9 @@ version = {attr = "FXrays.__version__"}
 [tool.cibuildwheel]
 build = "cp38* cp39* cp310* cp311* cp312* cp313*"
 skip = "*musllinux*"
-archs = "auto64"
+archs_macos = "auto64 universal2"
+archs_linux = "x86_64 aarch64"
+archs_windows = "all"
 test-command = "python -m FXrays.test"
 
 [tool.cibuildwheel.linux]
