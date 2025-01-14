@@ -40,7 +40,7 @@ test-command = "python -m FXrays.test"
 archs = "auto64 universal2"
 
 [tool.cibuildwheel.linux]
-archs = "x86_64 aarch64"
+archs = "native"
 repair-wheel-command = "auditwheel repair --strip -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.windows]
